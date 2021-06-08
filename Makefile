@@ -35,7 +35,7 @@ test:
 	${PYTHON} -m pytest tests
 
 build:
-	echo "build"
+	docker build -t ${DOCKER_IMAGE} -f Dockerfile .
 
 publish: build
 	echo "publish"
