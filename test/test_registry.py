@@ -1,15 +1,11 @@
-import os
-import json
 import logging
-import pytest
-import requests
+import logging
 import traceback
 import uuid
-import yaml
-from string import Template
-from tycho.context import Principal, TychoContext
-from tycho.client import TychoService, TychoSystem
 from unittest import mock
+
+from tycho.client import TychoSystem
+from tycho.context import Principal, TychoContext
 
 logger = logging.getLogger (__name__)
 

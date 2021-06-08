@@ -1,13 +1,7 @@
-import os
-import json
 import logging
-import pytest
-import yaml
-from tycho.client import TychoClient
-from tycho.test.lib import client
-from tycho.test.lib import system
-from tycho.test.lib import system_request
 from unittest import mock
+
+from tycho.client import TychoClient
 
 logger = logging.getLogger (__name__)
 

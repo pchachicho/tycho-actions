@@ -16,7 +16,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 with open(os.path.join(current, "tycho", "__init__.py"), encoding="utf8") as f:
-    version = re.search(r'__version__="(.*?)"', f.read()).group(1)
+    version = re.search(r'__version__ = "(.*?)"', f.read()).group(1)
+
 
 class PublishClass(Command):
     description = "Publish the package"
@@ -51,11 +52,12 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/helxplatform/tycho.git",
-    packages=['tycho', 'tycho.conf', 'tycho.sample', 'tycho.template', 'tycho.test'],
+    packages=['tycho', 'tycho.conf', 'tycho.sample', 'tycho.template', 'tycho'],
     package_data={'tycho':['*.yaml'],
                   'tycho.conf': ['*.yaml'],
                   'tycho.template': ['*.yaml'],
-                  'tycho.test.templates': ['*.yaml']},
+                  # 'tycho.test.templates': ['*.yaml']
+                  },
     include_package_data=True,
     entry_points={"console_scripts": ["tycho=tycho.api:main"]},
     install_requires=requirements,
