@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 
 def get_sample_spec(name):
     """ Load a docker-compose specification from our samples. """
-    result = None
     d = os.path.dirname(__file__)
     sample_path = os.path.join(d, "../tycho", "sample", name, "docker-compose.yaml")
     with open(sample_path, "r") as stream:

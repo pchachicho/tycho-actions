@@ -18,9 +18,16 @@ version:
 help:
 	@grep -E '^#[a-zA-Z\.\-]+:.*$$' $(MAKEFILE_LIST) | tr -d '#' | awk 'BEGIN {FS = ": "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
+clean:
+	${PYTHON} -m pip uninstall -y tycho-api
+	${PYTHON} -m pip uninstall -y -r requirements.txt
+
 install:
 	${PYTHON} -m pip install --upgrade pip
+	${PYTHON} -m pip install --upgrade wheel
+	${PYTHON} -m pip install --upgrade setuptools
 	${PYTHON} -m pip install -r requirements.txt
+	${PYTHON} -m pip install .
 
 #test: Run all tests
 test:
