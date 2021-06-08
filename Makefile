@@ -32,7 +32,7 @@ install:
 #test: Run all tests
 test:
 	# ${PYTHON} -m flake8 src
-	${PYTHON} -m pytest test
+	${PYTHON} -m pytest tests
 
 build:
 	echo "build"
