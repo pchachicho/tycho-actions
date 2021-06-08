@@ -3,7 +3,7 @@ VERSION_FILE = ./tycho/__init__.py
 VERSION      = $(shell cut -d " " -f 3 ${VERSION_FILE})
 DOCKER_REPO  = docker.io
 DOCKER_OWNER = helxplatform
-DOCKER_APP	 = dug
+DOCKER_APP	 = tycho
 DOCKER_TAG   = ${VERSION}
 DOCKER_IMAGE = ${DOCKER_OWNER}/${DOCKER_APP}:$(DOCKER_TAG)
 
@@ -38,4 +38,5 @@ build:
 	docker build -t ${DOCKER_IMAGE} -f Dockerfile .
 
 publish: build
-	echo "publish"
+	docker tag ${DOCKER_IMAGE} ${DOCKER_REPO}/${DOCKER_IMAGE}
+	docker push ${DOCKER_REPO}/${DOCKER_IMAGE}
