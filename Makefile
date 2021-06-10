@@ -3,7 +3,7 @@ VERSION_FILE = ./tycho/__init__.py
 VERSION      = $(shell cut -d " " -f 3 ${VERSION_FILE})
 DOCKER_REPO  = docker.io
 DOCKER_OWNER = helxplatform
-DOCKER_APP	 = tycho
+DOCKER_APP	 = tycho-api
 DOCKER_TAG   = ${VERSION}
 DOCKER_IMAGE = ${DOCKER_OWNER}/${DOCKER_APP}:$(DOCKER_TAG)
 
