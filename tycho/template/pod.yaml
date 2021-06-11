@@ -43,11 +43,11 @@ spec:
     # Fixed resources
     resources:
       requests:
-        memory: "250Mi"
-        cpu: "250m"
+        memory: {{ system.init_memory }}
+        cpu: {{ system.init_cpus }}
       limits:
-        memory: "500Mi"
-        cpu: "500m"
+        memory: {{ system.init_memory }}
+        cpu: {{ system.init_cpus }}
     {% if container.security_context.Uid and container.security_context.Gid %}
     command: ['sh', '-c'] 
     args: 

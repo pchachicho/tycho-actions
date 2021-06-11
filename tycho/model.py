@@ -171,9 +171,16 @@ class System:
         self.subpath_dir = os.environ.get('SUBPATH_DIR', self.username)
         self.shared_dir = os.environ.get('SHARED_DIR', 'shared')
         """Default UID and GID for the system"""
-        security_context = config.get('tycho')['compute']['system']['defaults']['securityContext']
+        security_context = self.config.get('tycho')['compute']['system']['defaults']['securityContext']
         self.Uid = security_context.get('Uid', '1000')
         self.Gid = security_context.get('Gid', '1000')
+        """Resources and limits for the init container"""
+        self.init_cpus = os.environ.get("INIT_CPUS", "250m")
+        self.init_memory = os.environ.get("INIT_MEMORY", "250Mi")
+
+    def _get_init_resources():
+        resources = self.config.get('tycho')['compute']['system']['defaults']['services']['init']['resources']
+        return resources
 
     def get_namespace(self, namespace="default"):
         try:
