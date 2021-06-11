@@ -1,4 +1,4 @@
-dist: xenial
+dist: bionic
 
 language: python
 python:
@@ -24,8 +24,8 @@ env:
     - MINIKUBE_WANTUPDATENOTIFICATION=false
     - MINIKUBE_WANTREPORTERRORPROMPT=false
     - MINIKUBE_HOME=$HOME
-    - MINIKUBE_VERSION=v1.18.1
-    - KUBERNETES_VERSION=v1.20.0
+    - MINIKUBE_VERSION=v1.20.0
+    - KUBERNETES_VERSION=v1.21.1
     - CHANGE_MINIKUBE_NONE_USER=true
     - KUBECONFIG=$HOME/.kube/config
     - DEV_PHASE=test
