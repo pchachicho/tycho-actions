@@ -1,8 +1,4 @@
-import os
-import json
-
 from pytest import mark
-from pytest import fixture
 
 from tycho.client import TychoClient
 
