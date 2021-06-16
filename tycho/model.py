@@ -155,7 +155,8 @@ class System:
         self.volumes = Volumes(self.identifier, containers).process_volumes()
         self.source_text = None
         self.system_port = None
-        """ Sytem environment variables """
+        self.ambassador_id = self._get_ambassador_id()
+        """ System environment variables """
         self.system_env = dict(principal)
         """ System tags """
         self.username = principal.get("username")
@@ -178,7 +179,10 @@ class System:
         self.init_cpus = os.environ.get("INIT_CPUS", "250m")
         self.init_memory = os.environ.get("INIT_MEMORY", "250Mi")
 
-    def _get_init_resources():
+    def _get_ambassador_id(self):
+        return os.environ.get("AMBASSADOR_ID", "")
+
+    def _get_init_resources(self):
         resources = self.config.get('tycho')['compute']['system']['defaults']['services']['init']['resources']
         return resources
 
