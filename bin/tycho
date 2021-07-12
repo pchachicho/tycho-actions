@@ -81,7 +81,7 @@ status () {
 ## Run unit tests.
 ##
 test () {
-    pytest $TYCHO/test $* #--log-format="%(asctime)s %(levelname)s %(message)s" $*
+    pytest $TYCHO_ROOT/tests $* #--log-format="%(asctime)s %(levelname)s %(message)s" $*
 }
 ##
 ## Run tests.

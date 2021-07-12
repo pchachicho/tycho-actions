@@ -253,8 +253,9 @@ class NullContext (TychoContext):
     A null context to facilitate client development.
     """
     def __init__(self, registry_config="app-registry.yaml", product="common"):
-        super ().__init__(stub=True)
-    def status (self, request=None):
+        super ().__init__(product=product, stub=True)
+
+    def status(self, request=None):
         """ Make up some rows. """
         identifier = uuid.uuid4 ()
         return TychoStatus (**{
@@ -271,6 +272,7 @@ class NullContext (TychoContext):
             ],
             "message" : "..."
         })
+
     def delete (self, request):
         """ Ingore deletes. """
         logger.debug (f"-- delete: {request}")
@@ -300,8 +302,8 @@ class ContextFactory:
     @staticmethod
     def get (product, context_type="null"):
         return {
-            "null" : NullContext (),
-            "live" : TychoContext (product=product)
+            "null" : NullContext(product=product),
+            "live" : TychoContext(product=product)
         }[context_type]
     
             
