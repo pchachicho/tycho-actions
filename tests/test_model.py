@@ -14,7 +14,7 @@ def test_system_model(request):
         "config": Config(),
         "name": "test",
         "principal": {"username": "renci"},
-        "serviceAccount": "default",
+        "service_account": "default",
         "conn_string": "",
         "containers": [
             {
