@@ -49,7 +49,7 @@ def test_system_parser(request):
             name="jupyter-ds",
             principal='{"username": "renci"}',
             system=structure,
-            serviceAccount="default")
+            service_account="default")
 
         print(f"{system}")
         assert system.name.startswith('jupyter-ds')

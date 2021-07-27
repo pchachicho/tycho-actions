@@ -305,7 +305,7 @@ class System:
             })
         system_specification = {"config": config, "name": name, "principal": principal,
                                 "service_account": service_account, "conn_string": spec.get("conn_string", ""),
-                                "proxy_rewrite_rule": spec.get("proxy_rewrite_rule"), "containers": containers,
+                                "proxy_rewrite_rule": spec.get("proxy_rewrite_rule", False), "containers": containers,
                                 'services': services}
         logger.debug (f"parsed-system: {json.dumps(system_specification, indent=2)}")
         system = System(**system_specification)
