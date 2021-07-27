@@ -65,6 +65,7 @@ contexts:
         docs: https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook
         services:
           jupyter-ds : "8888"
+        proxy-rewrite-rule: True
       filebrowser:
         name: File Browser
         description: File Browser - a utility for browsing files through a web interface
@@ -135,6 +136,7 @@ contexts:
         docs: https://github.com/helxplatform/helx-hail # TODO: Make proper docs.
         services:
           hail : 8000
+        proxy-rewrite-rule: True
       cloud-top:
         name: Cloud Top
         spec: ${catalyst_apps}/cloud-top/docker-compose.yaml
@@ -167,6 +169,7 @@ contexts:
         docs: https://systemsgenetics.github.io/GSForge/
         services:
           gsforge : 8888
+        proxy-rewrite-rule: True
       cloud-top:
         name: Cloud Top
         spec: ${catalyst_apps}/cloud-top/docker-compose.yaml
@@ -189,6 +192,7 @@ contexts:
         serviceAccount: spark
         services:
           blackbalsam : 8888
+        proxy-rewrite-rule: True
       #rshiny:
       #  name: R Shiny
       #  description: Shiny is an R package that makes it easy to build interactive web apps straight from R.
@@ -210,6 +214,7 @@ contexts:
         serviceAccount: spark
         services:
           blackbalsam-clinical : 8888
+        proxy-rewrite-rule: True
       sas-studio:
         name: SAS Studio
         description: Jump-start your data and analytics efforts with an interactive development environment.
@@ -218,6 +223,7 @@ contexts:
         env: { "CONN_STRING": "SASStudio" }
         services:
           sas-studio: 38080
+        proxy-rewrite-rule: True
     name: UNC Restarting Research
   heal:
     extends:
@@ -233,6 +239,7 @@ contexts:
         docs: https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook
         services:
           jupyter-education: "8888"
+        proxy-rewrite-rule: True
       filebrowser:
         name: File Browser
         description: File Browser - a utility for browsing files through a web interface
