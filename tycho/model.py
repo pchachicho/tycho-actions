@@ -119,7 +119,7 @@ class Container:
 
 class System:
     """ Distributed system of interacting containerized software. """
-    def __init__(self, config, name, principal, serviceAccount, conn_string, containers, services={}):
+    def __init__(self, config, name, principal, service_account, conn_string, proxy_rewrite_rule, containers, services={}):
         """ Construct a new abstract model of a system given a name and set of containers.
         
             Serves as context for the generation of compute cluster specific artifacts.
@@ -162,7 +162,7 @@ class System:
         self.username = principal.get("username")
         self.annotations = {}
         self.namespace = "default"
-        self.serviceaccount = serviceAccount
+        self.serviceaccount = service_account
         self.runasroot = os.environ.get("RUNASROOT", "true").lower()
         self.conn_string = conn_string
         """PVC flags and other variables for default volumes"""
@@ -178,6 +178,8 @@ class System:
         """Resources and limits for the init container"""
         self.init_cpus = os.environ.get("INIT_CPUS", "250m")
         self.init_memory = os.environ.get("INIT_MEMORY", "250Mi")
+        """Proxy rewrite rule for ambassador service annotations"""
+        self.proxy_rewrite_rule = proxy_rewrite_rule
 
     def _get_ambassador_id(self):
         return os.environ.get("AMBASSADOR_ID", "")
@@ -213,7 +215,7 @@ class System:
         return template
 
     @staticmethod
-    def parse (config, name, principal, system, serviceAccount, env={}, services={}):
+    def parse (config, name, principal, system, service_account, env={}, services={}):
         """ Construct a system model based on the input request.
 
             Parses a docker-compose spec into a system specification.
@@ -288,28 +290,23 @@ class System:
             env_from_spec = (spec.get('env', []) or spec.get('environment', []))
             env_from_registry = [f"{ev}={os.environ.get('STDNFS_PVC')}" if '$STDNFS' in env[ev] else f"{ev}={env[ev]}" for ev in env]
             env_all = env_from_spec + env_from_registry
-            containers.append ({
-                "name"    : cname,
-                "image"   : spec['image'],
-                "command" : entrypoint,
-                "env"     : env_all,
-                "limits"  : spec.get ('deploy',{}).get('resources',{}).get('limits',{}),
-                "requests"  : spec.get ('deploy',{}).get('resources',{}).get('reservations',{}),
-                "ports"   : ports,
-                "expose"  : expose,
+            containers.append({
+                "name": cname,
+                "image": spec['image'],
+                "command": entrypoint,
+                "env": env_all,
+                "limits": spec.get('deploy',{}).get('resources',{}).get('limits',{}),
+                "requests": spec.get('deploy',{}).get('resources',{}).get('reservations',{}),
+                "ports": ports,
+                "expose": expose,
                 "depends_on": spec.get("depends_on", []),
-                "volumes"  : [ v for v in spec.get("volumes", []) ],
-                "securityContext" :  spec.get("securityContext", {})
+                "volumes": [v for v in spec.get("volumes", [])],
+                "securityContext":  spec.get("securityContext", {})
             })
-        system_specification = {
-            "config"     : config,
-            "name"       : name,
-            "principal"   : principal,
-            "serviceAccount": serviceAccount,
-            "conn_string": spec.get("conn_string", ""),
-            "containers" : containers
-        }
-        system_specification['services'] = services
+        system_specification = {"config": config, "name": name, "principal": principal,
+                                "service_account": service_account, "conn_string": spec.get("conn_string", ""),
+                                "proxy_rewrite_rule": spec.get("proxy_rewrite_rule", False), "containers": containers,
+                                'services': services}
         logger.debug (f"parsed-system: {json.dumps(system_specification, indent=2)}")
         system = System(**system_specification)
         system.source_text = yaml.dump (system)
