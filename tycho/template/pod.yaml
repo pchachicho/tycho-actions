@@ -15,6 +15,7 @@ metadata:
     name: {{ system.name }}
     username: {{ system.username }}
     app-name: {{ system.system_name }}
+    original-app-name: {{ system.system_name }}
     reaper-label: {{ system.system_name }}
     executor: tycho
     tycho-guid: {{ system.identifier }}
