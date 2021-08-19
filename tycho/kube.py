@@ -441,7 +441,7 @@ class KubernetesCompute(Compute):
                 result.append(
                     {
                         "name": item.metadata.name,
-                        "app_id": item.spec.template.metadata.labels.get('app-name', None),
+                        "app_id": item.spec.template.metadata.labels.get('original-app-name', None),
                         "sid": item_guid,
                         "ip_address": ip_address,
                         "port": str(port),
