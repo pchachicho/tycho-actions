@@ -51,7 +51,7 @@ repositories:
   catalyst_apps:
     # This is the Dockstore app prototype repository. GA4GH TRS in future?
     description: Main repository for Catalyst Apps and Tools
-    url: https://github.com/helxplatform/app-support-prototype/raw/master/dockstore-yaml-proposals
+    url: https://github.com/helxplatform/app-support-prototype/raw/develop/dockstore-yaml-proposals
 contexts:
   # The common context provides a convenient base set of applications.
   # Other contexts can extend it to include these apps.
@@ -229,6 +229,27 @@ contexts:
     extends:
       - common
     name: NIH HEAL Initiative
+  argus:
+    extends:
+      - common
+    name: Argus Array
+    apps:
+      kstars:
+        name: KStars And DS9
+        description: Sample FITS image file handling software.
+        details: FITS image file handling software and sample FITS files for demo.
+        docs: https://www.loc.gov/preservation/digital/formats/fdd/fdd000317.shtml
+        services:
+          kstars: 8080
+      cloud-top:
+        name: Cloud Top
+        spec: ${catalyst_apps}/cloud-top/docker-compose.yaml
+        icon: ${catalyst_apps}/cloud-top/icon.png
+        description: CloudTop is a cloud native, browser accessible Linux desktop.
+        details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
+        docs: https://helxplatform.github.io/cloudtop-docs/
+        services:
+          cloud-top: 8080
   eduhelx:
     name: UNC Helx for Education
     apps:
