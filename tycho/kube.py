@@ -188,7 +188,7 @@ class KubernetesCompute(Compute):
 
             """ Create a deployment for the pod. """
             for pod_manifest in pod_manifests:
-                deployment = self.pod_to_deployment (
+                deployment,create_deployment_api_response = self.pod_to_deployment (
                     name=system.name,
                     username=system.username,
                     identifier=system.identifier,
@@ -216,9 +216,8 @@ class KubernetesCompute(Compute):
                     logger.debug (f"generating service for container {container.name}")
                     service_manifests = system.render (
                         template = "service.yaml",
-                        context = {
-                            "service" : service
-                        })
+                        context = { "service" : service, "create_deployment_api_response":create_deployment_api_response }
+                    )
                     for service_manifest in service_manifests:
                         logger.debug (f"-- creating service for container {container.name}")                        
                         response = self.api.create_namespaced_service(
@@ -342,7 +341,7 @@ class KubernetesCompute(Compute):
             body=deployment,
             namespace=namespace)
         logger.debug (f"deployment created. status={api_response.status}")
-        return deployment
+        return deployment,api_response
 
     def delete (self, name, namespace="default"):
         """ Delete the deployment. 
