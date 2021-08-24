@@ -9,6 +9,12 @@ metadata:
     tycho-app: {{ system.name }}
     tycho-guid: {{ system.identifier }}
     conn_string: {{ system.conn_string }}
+  ownerReferences:
+  - apiVersion: apps/v1
+    controller: true
+    kind: Deployment
+    name: {{ create_deployment_api_response.metadata.name }}
+    uid: {{ create_deployment_api_response.metadata.uid }}
   name: {{ service.name }}
   {% if system.amb %}
   annotations: 
