@@ -51,6 +51,10 @@ repositories:
   catalyst_apps:
     # This is the Dockstore app prototype repository. GA4GH TRS in future?
     description: Main repository for Catalyst Apps and Tools
+    url: https://github.com/helxplatform/app-support-prototype/raw/master/dockstore-yaml-proposals
+  argus_apps:
+    # This is the Dockstore app prototype repository. GA4GH TRS in future?
+    description: Main repository for Argus Apps and Tools
     url: https://github.com/helxplatform/app-support-prototype/raw/develop/dockstore-yaml-proposals
 contexts:
   # The common context provides a convenient base set of applications.
@@ -243,8 +247,8 @@ contexts:
           kstars: 8080
       cloud-top:
         name: Cloud Top
-        spec: ${catalyst_apps}/cloud-top/docker-compose.yaml
-        icon: ${catalyst_apps}/cloud-top/icon.png
+        spec: ${argus_apps}/cloud-top/docker-compose.yaml
+        icon: ${argus_apps}/cloud-top/icon.png
         description: CloudTop is a cloud native, browser accessible Linux desktop.
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
