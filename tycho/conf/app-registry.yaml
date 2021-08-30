@@ -240,8 +240,8 @@ contexts:
     apps:
       kstars:
         name: KStars And DS9
-        spec: ${argus_apps}/cloud-top/docker-compose.yaml
-        icon: ${argus_apps}/cloud-top/icon.png
+        spec: ${argus_apps}/kstars/docker-compose.yaml
+        icon: ${argus_apps}/kstars/icon.png
         description: Sample FITS image file handling software.
         details: FITS image file handling software and sample FITS files for demo.
         docs: https://www.loc.gov/preservation/digital/formats/fdd/fdd000317.shtml
