@@ -143,8 +143,8 @@ class TychoContext:
             url = None
             response = None
             try:
-                logger.debug (f"-- resolving specification for app: {app_id}")
                 url = self.apps[app_id]['spec']
+                logger.debug (f"-- resolving specification for app: {app_id} via {url}")
                 response = self.http_session.get (url)
                 if response.status_code != 200:
                     raise ValueError (f"-- app {app_id}. failed to parse spec. code:{response.status_code}")
