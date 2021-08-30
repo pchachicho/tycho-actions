@@ -180,7 +180,7 @@ class TychoContext:
         if not env:
             url = self.apps[app_id]['spec']
             env_url = os.path.join (os.path.dirname (url), ".env")
-            logger.debug (f"-- resolving settings for app: {app_id}")
+            logger.debug (f"-- resolving settings for app: {app_id} via {env_url}")
             response = self.http_session.get (env_url)
             if response.status_code == 200:
                 logger.debug (f"-- got settings for {app_id}")
