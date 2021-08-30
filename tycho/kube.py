@@ -251,7 +251,7 @@ class KubernetesCompute(Compute):
                 message=f"Unable to start system: {system.name}",
                 details=text)
 
-        logger.debug (f"result: {json.dumps(result,indent=2)}")
+        logger.info (f"result of the app launch: {json.dumps(result,indent=2)}")
         return result
 
     def get_service_ip_address (self, service_metadata):
