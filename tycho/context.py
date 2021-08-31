@@ -145,7 +145,7 @@ class TychoContext:
             try:
                 url = self.apps[app_id]['spec']
                 logger.debug (f"-- resolving specification for app: {app_id} via {url}")
-                if not self.apps[app_id]['spec_obj']:
+                if self.apps[app_id].get('spec_obj', None) is None:
                     logger.debug (f"-- no spec_obj for app: {app_id}")
                     sess = self.http_session
                     with sess.cache_disabled():
