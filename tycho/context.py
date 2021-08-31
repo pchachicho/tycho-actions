@@ -145,7 +145,14 @@ class TychoContext:
             try:
                 url = self.apps[app_id]['spec']
                 logger.debug (f"-- resolving specification for app: {app_id} via {url}")
-                response = self.http_session.get (url)
+                if not self.apps[app_id]['spec_obj']:
+                    logger.debug (f"-- no spec_obj for app: {app_id}")
+                    sess = self.http_session
+                    with sess.cache_disabled():
+                        response = sess.get (url)
+                else:
+                    logger.debug (f"-- spec_obj for app: {app_id} len={len(self.apps[app_id]['spec_obj'])}")
+                    response = self.http_session.get (url)
                 if response.status_code != 200:
                     raise ValueError (f"-- app {app_id}. failed to parse spec. code:{response.status_code}")
                 spec = yaml.safe_load (response.text)
