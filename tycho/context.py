@@ -143,16 +143,13 @@ class TychoContext:
             url = None
             response = None
             try:
+                logger.debug (f"-- resolving specification for app: {app_id}")
                 url = self.apps[app_id]['spec']
-                logger.debug (f"-- resolving specification for app: {app_id} via {url}")
-                sess = self.http_session
-                with sess.cache_disabled():
-                    response = sess.get (url)
+                response = self.http_session.get (url)
                 if response.status_code != 200:
                     raise ValueError (f"-- app {app_id}. failed to parse spec. code:{response.status_code}")
                 spec = yaml.safe_load (response.text)
                 self.apps[app_id]['spec_obj'] = spec
-                logger.debug (f"-- resolved specification for app: {app_id} is '{spec}'")
             except Exception as e:
                 traceback.print_exc ()
                 if response:
@@ -183,7 +180,7 @@ class TychoContext:
         if not env:
             url = self.apps[app_id]['spec']
             env_url = os.path.join (os.path.dirname (url), ".env")
-            logger.debug (f"-- resolving settings for app: {app_id} via {env_url}")
+            logger.debug (f"-- resolving settings for app: {app_id}")
             response = self.http_session.get (env_url)
             if response.status_code == 200:
                 logger.debug (f"-- got settings for {app_id}")
