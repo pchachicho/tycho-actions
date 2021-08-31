@@ -150,6 +150,7 @@ class TychoContext:
                     raise ValueError (f"-- app {app_id}. failed to parse spec. code:{response.status_code}")
                 spec = yaml.safe_load (response.text)
                 self.apps[app_id]['spec_obj'] = spec
+                logger.debug (f"-- resolved specification for app: {app_id} is '{spec}'")
             except Exception as e:
                 traceback.print_exc ()
                 if response:
