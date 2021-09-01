@@ -57,7 +57,7 @@ repositories:
     description: Main repository for Argus Apps and Tools
     #url: https://github.com/helxplatform/app-support-prototype/raw/develop/dockstore-yaml-proposals
     # raw base url is needed here
-    url: https://raw.githubusercontent.com/helxplatform/app-support-prototype/5e98f2f2700ce2e5bbc5dfa11a23b54690131683/dockstore-yaml-proposals
+    url: https://raw.githubusercontent.com/helxplatform/app-support-prototype/2de966e9b784f6dd562aa890963e38f67ca4ffc0/dockstore-yaml-proposals
 contexts:
   # The common context provides a convenient base set of applications.
   # Other contexts can extend it to include these apps.
