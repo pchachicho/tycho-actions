@@ -133,8 +133,6 @@ class TychoContext:
                 app_definition = yaml.safe_load(response.text)
                 self.apps[app_id]['definition'] = app_definition
             except Exception as e:
-                if response.status_code == 200:
-                    logger.error (f"response: '{response.text}'")
                 logger.error (f"-- app {app_id}. failed to parse definition.\nstatus code:{response.status_code}\nerror: {e}")
         return app_definition
 
