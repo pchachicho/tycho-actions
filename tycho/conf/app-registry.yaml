@@ -109,8 +109,6 @@ contexts:
           napari : 8080
       cloud-top:
         name: Cloud Top
-        spec: ${catalyst_apps}/cloud-top/docker-compose.yaml
-        icon: ${catalyst_apps}/cloud-top/icon.png
         description: CloudTop is a cloud native, browser accessible Linux desktop.
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
@@ -139,8 +137,6 @@ contexts:
         proxy-rewrite-rule: True
       cloud-top:
         name: Cloud Top
-        spec: ${catalyst_apps}/cloud-top/docker-compose.yaml
-        icon: ${catalyst_apps}/cloud-top/icon.png
         description: CloudTop is a cloud native, browser accessible Linux desktop.
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
@@ -172,8 +168,6 @@ contexts:
         proxy-rewrite-rule: True
       cloud-top:
         name: Cloud Top
-        spec: ${catalyst_apps}/cloud-top/docker-compose.yaml
-        icon: ${catalyst_apps}/cloud-top/icon.png
         description: CloudTop is a cloud native, browser accessible Linux desktop.
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
@@ -236,8 +230,6 @@ contexts:
     apps:
       kstars:
         name: KStars And DS9
-        spec: ${catalyst_apps}/kstars/docker-compose.yaml
-        icon: ${catalyst_apps}/kstars/icon.png
         description: Sample FITS image file handling software.
         details: FITS image file handling software and sample FITS files for demo.
         docs: https://www.loc.gov/preservation/digital/formats/fdd/fdd000317.shtml
@@ -245,8 +237,6 @@ contexts:
           kstars: 8080
       cloud-top:
         name: Cloud Top
-        spec: ${catalyst_apps}/cloud-top/docker-compose.yaml
-        icon: ${catalyst_apps}/cloud-top/icon.png
         description: CloudTop is a cloud native, browser accessible Linux desktop.
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
@@ -272,8 +262,6 @@ contexts:
           filebrowser: "8888"
       cloud-top:
         name: Cloud Top
-        spec: ${catalyst_apps}/cloud-top/docker-compose.yaml
-        icon: ${catalyst_apps}/cloud-top/icon.png
         description: CloudTop is a cloud native, browser accessible Linux desktop.
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
