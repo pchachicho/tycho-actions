@@ -48,9 +48,9 @@ metadata:
   author: HeLx Dev
   description: An alpha metadata registry for HeLx applications.
 repositories:
-  catalyst_apps:
+  helx_apps:
     # This is the Dockstore app prototype repository. GA4GH TRS in future?
-    description: Main repository for Catalyst Apps and Tools
+    description: Main repository for HeLx Apps and Tools
     url: https://github.com/helxplatform/app-support-prototype/raw/master/dockstore-yaml-proposals
 contexts:
   # The common context provides a convenient base set of applications.
