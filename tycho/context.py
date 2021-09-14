@@ -226,6 +226,7 @@ class TychoContext:
         """ Add a proxy rewrite rule """
         proxy_rewrite_rule = self.apps.get(app_id).get("proxy-rewrite-rule", False)
         spec["services"][app_id]["proxy_rewrite_rule"] = proxy_rewrite_rule
+
         if spec is not None:
             system = self._start ({
                 "name"       : app_id,
