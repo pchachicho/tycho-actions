@@ -66,6 +66,7 @@ contexts:
         services:
           jupyter-ds : "8888"
         proxy-rewrite-rule: True
+        count: -1
       filebrowser:
         name: File Browser
         description: File Browser - a utility for browsing files through a web interface
@@ -73,6 +74,7 @@ contexts:
         docs: https://filebrowser.org/
         services:
           filebrowser: "8888"
+        count: 1
       octave:
         name: Octave
         description: A scientific programming language largely compatible with MATLAB.
@@ -80,6 +82,7 @@ contexts:
         docs: https://www.gnu.org/software/octave 
         services:
           octave : 8080
+        count: 1
   braini:
     extends:
       - common
@@ -99,6 +102,7 @@ contexts:
         docs: https://imagej.nih.gov/ij/
         services:
           imagej: 8080
+        count: 1
       # TODO: separate napari and imagej, updating these appropriately.
       napari:
         name: Napari Image Viewer
@@ -107,13 +111,15 @@ contexts:
         docs: https://napari.org/
         services:
           napari : 8080
+        count: 1
       cloud-top:
         name: Cloud Top
         description: CloudTop is a cloud native, browser accessible Linux desktop.
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
-          cloud-top : 8080            
+          cloud-top : 8080
+        count: 1            
   catalyst:
     extends:
       - common
@@ -127,6 +133,7 @@ contexts:
         docs: https://ohif.org/
         services:
           dicom-gh : 8080
+        count: 1
       hail:
         name: Hail / Jupyter Workspace
         description: A notebook computing interface to a large single node Hail genomics workspace.
@@ -134,6 +141,7 @@ contexts:
         docs: https://github.com/helxplatform/helx-hail # TODO: Make proper docs.
         services:
           hail : 8000
+        count: -1
         proxy-rewrite-rule: True
       cloud-top:
         name: Cloud Top
@@ -142,6 +150,7 @@ contexts:
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
           cloud-top : 8080
+        count: 1
   scidas:
     extends:
       - common
@@ -156,6 +165,7 @@ contexts:
         services:
           nextflow : 8080
         env: {"PVC_NAME": $STDNFS}
+        count: -1
       gsforge:
         name: GSForge
         description: >
@@ -166,6 +176,7 @@ contexts:
         services:
           gsforge : 8888
         proxy-rewrite-rule: True
+        count: -1
       cloud-top:
         name: Cloud Top
         description: CloudTop is a cloud native, browser accessible Linux desktop.
@@ -173,6 +184,7 @@ contexts:
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
           cloud-top : 8080
+        count: 1
   blackbalsam:
     extends:
       - common
@@ -187,6 +199,7 @@ contexts:
         services:
           blackbalsam : 8888
         proxy-rewrite-rule: True
+        count: -1
       #rshiny:
       #  name: R Shiny
       #  description: Shiny is an R package that makes it easy to build interactive web apps straight from R.
@@ -209,6 +222,7 @@ contexts:
         services:
           blackbalsam-clinical : 8888
         proxy-rewrite-rule: True
+        count: -1
       sas-studio:
         name: SAS Studio
         description: Jump-start your data and analytics efforts with an interactive development environment.
@@ -218,6 +232,7 @@ contexts:
         services:
           sas-studio: 38080
         proxy-rewrite-rule: True
+        count: -1
     name: UNC Restarting Research
   heal:
     extends:
@@ -235,6 +250,7 @@ contexts:
         docs: https://www.loc.gov/preservation/digital/formats/fdd/fdd000317.shtml
         services:
           kstars: 8080
+        count: 1
       cloud-top:
         name: Cloud Top
         description: CloudTop is a cloud native, browser accessible Linux desktop.
@@ -242,6 +258,7 @@ contexts:
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
           cloud-top: 8080
+        count: 1
   eduhelx:
     name: UNC Helx for Education
     apps:
@@ -253,6 +270,7 @@ contexts:
         services:
           jupyter-education: "8888"
         proxy-rewrite-rule: True
+        count: -1
       filebrowser:
         name: File Browser
         description: File Browser - a utility for browsing files through a web interface
@@ -263,6 +281,7 @@ contexts:
           runAsUser: 1000
         services:
           filebrowser: "8888"
+        count: 1
       cloud-top:
         name: Cloud Top
         description: CloudTop is a cloud native, browser accessible Linux desktop.
@@ -270,3 +289,4 @@ contexts:
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
           cloud-top: 8080
+        count: 1
