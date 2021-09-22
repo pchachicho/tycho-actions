@@ -48,9 +48,9 @@ metadata:
   author: HeLx Dev
   description: An alpha metadata registry for HeLx applications.
 repositories:
-  catalyst_apps:
+  helx_apps:
     # This is the Dockstore app prototype repository. GA4GH TRS in future?
-    description: Main repository for Catalyst Apps and Tools
+    description: Main repository for HeLx Apps and Tools
     url: https://github.com/helxplatform/app-support-prototype/raw/master/dockstore-yaml-proposals
 contexts:
   # The common context provides a convenient base set of applications.
@@ -65,6 +65,8 @@ contexts:
         docs: https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook
         services:
           jupyter-ds : "8888"
+        proxy-rewrite-rule: True
+        count: -1
       filebrowser:
         name: File Browser
         description: File Browser - a utility for browsing files through a web interface
@@ -72,6 +74,7 @@ contexts:
         docs: https://filebrowser.org/
         services:
           filebrowser: "8888"
+        count: 1
       octave:
         name: Octave
         description: A scientific programming language largely compatible with MATLAB.
@@ -79,13 +82,7 @@ contexts:
         docs: https://www.gnu.org/software/octave 
         services:
           octave : 8080
-      #rstudio-server:
-      #  name: R Studio Server
-      #  description: R Studio Server is a web based notebook environment for R development.
-      #  details: Provides notebook computing experience with the R Studio development environment.
-      #  docs: https://rstudio.com/products/rstudio/
-      #  services:
-      #    rstudio-server : 8787
+        count: 1
   braini:
     extends:
       - common
@@ -105,6 +102,7 @@ contexts:
         docs: https://imagej.nih.gov/ij/
         services:
           imagej: 8080
+        count: 1
       # TODO: separate napari and imagej, updating these appropriately.
       napari:
         name: Napari Image Viewer
@@ -113,28 +111,21 @@ contexts:
         docs: https://napari.org/
         services:
           napari : 8080
+        count: 1
       cloud-top:
         name: Cloud Top
-        spec: ${catalyst_apps}/cloud-top/docker-compose.yaml
-        icon: ${catalyst_apps}/cloud-top/icon.png
         description: CloudTop is a cloud native, browser accessible Linux desktop.
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
-          cloud-top : 8080            
+          cloud-top : 8080
+        count: 1            
   catalyst:
     extends:
       - common
       - blackbalsam
     name: BioData Catalyst App Registry
     apps:
-      #dicom-cloudtop:
-      #  name: DICOM Viewer
-      #  description: OHIF is a framework for building medical imaging web applications.
-      #  details: Uses the OrthaNC DICOM service for indexing image data.
-      #  docs: https://ohif.org/
-      #  services:
-      #    dicom-cloudtop : 8080
       dicom-gh:
         name: DICOM Viewer - Google Health
         description: OHIF is a framework for building medical imaging web applications.
@@ -142,14 +133,7 @@ contexts:
         docs: https://ohif.org/
         services:
           dicom-gh : 8080
-      # TODO: is this just jupyter-ds with access to autoencoder python modules? If so, delete this app.
-      #autoencoder-notebook:
-      #  name: Autoencoder Notebook
-      #  description: need description.
-      #  details: need details.
-      #  docs: http://we.need.autoencoder.docs/doc.html # TODO: need these
-      #  services:
-      #    jupyter : 8888          
+        count: 1
       hail:
         name: Hail / Jupyter Workspace
         description: A notebook computing interface to a large single node Hail genomics workspace.
@@ -157,15 +141,16 @@ contexts:
         docs: https://github.com/helxplatform/helx-hail # TODO: Make proper docs.
         services:
           hail : 8000
+        count: -1
+        proxy-rewrite-rule: True
       cloud-top:
         name: Cloud Top
-        spec: ${catalyst_apps}/cloud-top/docker-compose.yaml
-        icon: ${catalyst_apps}/cloud-top/icon.png
         description: CloudTop is a cloud native, browser accessible Linux desktop.
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
           cloud-top : 8080
+        count: 1
   scidas:
     extends:
       - common
@@ -180,6 +165,7 @@ contexts:
         services:
           nextflow : 8080
         env: {"PVC_NAME": $STDNFS}
+        count: -1
       gsforge:
         name: GSForge
         description: >
@@ -189,15 +175,16 @@ contexts:
         docs: https://systemsgenetics.github.io/GSForge/
         services:
           gsforge : 8888
+        proxy-rewrite-rule: True
+        count: -1
       cloud-top:
         name: Cloud Top
-        spec: ${catalyst_apps}/cloud-top/docker-compose.yaml
-        icon: ${catalyst_apps}/cloud-top/icon.png
         description: CloudTop is a cloud native, browser accessible Linux desktop.
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
           cloud-top : 8080
+        count: 1
   blackbalsam:
     extends:
       - common
@@ -211,13 +198,8 @@ contexts:
         serviceAccount: spark
         services:
           blackbalsam : 8888
-      #hail:
-      #  name: Hail
-      #  description: Hail is an open-source, general-purpose, Python-based data analysis library.
-      #  details: It provides additional data types and methods for working with genomic data.
-      #  docs: https://hail.is/
-      #  services:
-      #    hail : 8000
+        proxy-rewrite-rule: True
+        count: -1
       #rshiny:
       #  name: R Shiny
       #  description: Shiny is an R package that makes it easy to build interactive web apps straight from R.
@@ -239,6 +221,8 @@ contexts:
         serviceAccount: spark
         services:
           blackbalsam-clinical : 8888
+        proxy-rewrite-rule: True
+        count: -1
       sas-studio:
         name: SAS Studio
         description: Jump-start your data and analytics efforts with an interactive development environment.
@@ -247,8 +231,62 @@ contexts:
         env: { "CONN_STRING": "SASStudio" }
         services:
           sas-studio: 38080
+        proxy-rewrite-rule: True
+        count: -1
     name: UNC Restarting Research
   heal:
     extends:
       - common
     name: NIH HEAL Initiative
+  argus:
+    extends:
+      - common
+    name: Argus Array
+    apps:
+      kstars:
+        name: KStars And DS9
+        description: Sample FITS image file handling software.
+        details: FITS image file handling software and sample FITS files for demo.
+        docs: https://www.loc.gov/preservation/digital/formats/fdd/fdd000317.shtml
+        services:
+          kstars: 8080
+        count: 1
+      cloud-top:
+        name: Cloud Top
+        description: CloudTop is a cloud native, browser accessible Linux desktop.
+        details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
+        docs: https://helxplatform.github.io/cloudtop-docs/
+        services:
+          cloud-top: 8080
+        count: 1
+  eduhelx:
+    name: UNC Helx for Education
+    apps:
+      jupyter-education:
+        name: Jupyter Data Science for Education
+        description: Jupyter DataScience - A Jupyter notebook for exploring and visualizing data.
+        details: Includes R, Julia, and Python.
+        docs: https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook
+        services:
+          jupyter-education: "8888"
+        proxy-rewrite-rule: True
+        count: 1
+      filebrowser:
+        name: File Browser
+        description: File Browser - a utility for browsing files through a web interface
+        details: File Browser provides a web interface for browsing files in a cloud environment.
+        docs: https://filebrowser.org/
+        securityContext:
+          fsGroup: 1000
+          runAsUser: 1000
+        services:
+          filebrowser: "8888"
+        count: 1
+      cloud-top:
+        name: Cloud Top
+        description: CloudTop is a cloud native, browser accessible Linux desktop.
+        details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
+        docs: https://helxplatform.github.io/cloudtop-docs/
+        services:
+          cloud-top: 8080
+        count: 1

@@ -188,7 +188,7 @@ class KubernetesCompute(Compute):
 
             """ Create a deployment for the pod. """
             for pod_manifest in pod_manifests:
-                deployment = self.pod_to_deployment (
+                deployment,create_deployment_api_response = self.pod_to_deployment (
                     name=system.name,
                     username=system.username,
                     identifier=system.identifier,
@@ -216,9 +216,8 @@ class KubernetesCompute(Compute):
                     logger.debug (f"generating service for container {container.name}")
                     service_manifests = system.render (
                         template = "service.yaml",
-                        context = {
-                            "service" : service
-                        })
+                        context = { "service" : service, "create_deployment_api_response":create_deployment_api_response }
+                    )
                     for service_manifest in service_manifests:
                         logger.debug (f"-- creating service for container {container.name}")                        
                         response = self.api.create_namespaced_service(
@@ -252,7 +251,7 @@ class KubernetesCompute(Compute):
                 message=f"Unable to start system: {system.name}",
                 details=text)
 
-        logger.debug (f"result: {json.dumps(result,indent=2)}")
+        logger.info (f"result of the app launch: {json.dumps(result,indent=2)}")
         return result
 
     def get_service_ip_address (self, service_metadata):
@@ -342,7 +341,7 @@ class KubernetesCompute(Compute):
             body=deployment,
             namespace=namespace)
         logger.debug (f"deployment created. status={api_response.status}")
-        return deployment
+        return deployment,api_response
 
     def delete (self, name, namespace="default"):
         """ Delete the deployment. 
@@ -354,19 +353,6 @@ class KubernetesCompute(Compute):
         """
         namespace = self.namespace #self.get_namespace()
         try: 
-            """ todo: kubectl delete pv,pvc,deployment,pod,svc,networkpolicy -l executor=tycho """
-            """ Delete the service. No obvious collection based api for service deletion. """
-            service_list = self.api.list_namespaced_service(
-                label_selector=f"tycho-guid={name}",
-                namespace=namespace)
-            for service in service_list.items:
-                if service.metadata.labels.get ("tycho-guid", None) == name:
-                    logger.debug (f" --deleting service {name} in namespace {namespace}")
-                    response = self.api.delete_namespaced_service(
-                        name=service.metadata.name,
-                        body={},
-                        namespace=namespace)
-            
             """ Treat everything with a namespace parameterized collections based delete 
             operator the same. """
             finalizers = {
@@ -402,52 +388,55 @@ class KubernetesCompute(Compute):
             :type name: str
             :param namespace: Namespace the system runs in.
             :type namespace: str
-        """            
+        """
         namespace = self.namespace
         result = []
+
         """ Find all our generated deployments. """
         label = f"tycho-guid={name}" if name else f"executor=tycho"
         if username:
             label = f"username={username}" if username else f"executor=tycho"
-        logger.debug (f"-- status label: {label}")                
+        logger.debug (f"-- status label: {label}")
         response = self.extensions_api.list_namespaced_deployment (
             namespace,
             label_selector=label)
+
         if response is not None:
             for item in response.items:
-                
+
                 """ Collect pod metrics for this deployment. """
                 pod_resources = {
                     container.name : container.resources.limits
                     for container in item.spec.template.spec.containers
                 }
                 logger.debug(f"-- pod-resources {pod_resources}")
-                
+
                 item_guid = item.metadata.labels.get ("tycho-guid", None)
 
-                """Get the workspace name of the pod"""
+                """ Get the creation timestamp"""
+                c_time = item.metadata.creation_timestamp
+                time = f"{c_time.month}-{c_time.day}-{c_time.year} {c_time.hour}:{c_time.minute}:{c_time.second}"
+
+                """ Get the workspace name of the pod """
                 workspace_name = item.spec.template.metadata.labels.get("app-name", "")
 
-                """ List all services with this guid. """
-                services = self.api.list_namespaced_service(
-                    label_selector=f"tycho-guid={item_guid}",
-                    namespace=namespace)
-                """ Inspect and report each service connected to this element separately. """
-                for service in services.items:
-                    c_time = service.metadata.creation_timestamp
-                    time = f"{c_time.month}-{c_time.day}-{c_time.year} {c_time.hour}:{c_time.minute}:{c_time.second}"
-                    ip_address = self.get_service_ip_address (service)
-                    port = service.spec.ports[0].node_port
-                    result.append ({
-                        "name"          : service.metadata.name,
-                        "app_id"        : service.metadata.labels.get ('tycho-app', None),
-                        "sid"           : item_guid,
-                        "ip_address"    : ip_address,
-                        "port"          : str(port),
-                        "creation_time" : time,
-                        "utilization"   : pod_resources,
+                """ Temporary variables so rest of the code doesn't break elsewhere. """
+                ip_address = "127.0.0.1"
+                port = 80
+
+                result.append(
+                    {
+                        "name": item.metadata.name,
+                        "app_id": item.spec.template.metadata.labels.get('original-app-name', None),
+                        "sid": item_guid,
+                        "ip_address": ip_address,
+                        "port": str(port),
+                        "creation_time": time,
+                        "utilization": pod_resources,
                         "workspace_name": workspace_name
-                    })
+                    }
+                )
+
         return result
 
     def modify(self, system_modify):

@@ -50,7 +50,7 @@ tycho status
 hits=0
 minikube_ip=$(minikube ip)
 echo --testing $instances instances at $minikube_ip ...
-for p in $(tycho status | grep $test_tag | grep -v PORT | awk '{ print $4 }'); do
+for p in $(kubectl get svc | grep $test_tag | awk '{ print $1 }' | xargs kubectl get svc -o jsonpath='{.spec.ports[].nodePort}'); do
     failed=1
     for cycle in $(seq 1 $max_cycles); do
         echo --testing http://$minikube_ip:$p cycle: $cycle
