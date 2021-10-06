@@ -13,6 +13,7 @@ def test_system_model(request):
     system = System(**{
         "config": Config(),
         "name": "test",
+        "identifier":System.get_identifier(),
         "principal": {"username": "renci"},
         "service_account": "default",
         "conn_string": "",

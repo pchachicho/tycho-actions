@@ -26,6 +26,7 @@ mem_converter = {
 }
 
 
+
 class TychoService:
     """ Represent a service endpoint. """
     try_minikube = True

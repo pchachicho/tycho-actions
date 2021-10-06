@@ -172,6 +172,52 @@ spec:
   {% endif %}
   {% endfor %}
   {% endif %}
+{% if container.liveness_probe %}
+    livenessProbe:
+      {% if container.liveness_probe.cmd %}
+      exec:
+        command:
+          {% for arg in container.liveness_probe.cmd %}
+          - {{ arg }}
+          {% endfor %}
+      {% else %}
+      httpGet:
+        path: {{ container.liveness_probe.path }}
+        port: {{ container.liveness_probe.port }}
+        {% if container.liveness_probe.httpHeaders %}
+        httpHeaders:
+          {% for name in container.liveness_probe.httpHeaders %}
+          - name: {{ name }}
+            value: {{ container.liveness_probe.httpHeaders[name] }}
+          {% endfor %}
+        {% endif %}
+      {% endif %}
+    initialDelaySeconds: {{ container.liveness_probe.delay }}
+    periodSeconds: {{ container.liveness_probe.period }}
+{% endif %}
+{% if container.readiness_probe %}
+    readinessProbe:
+      {% if container.readiness_probe.cmd %}
+      exec:
+        command:
+          {% for arg in container.readiness_probe.cmd %}
+          - {{ arg }}
+          {% endfor %}
+      {% else %}
+      httpGet:
+        path: {{ container.readiness_probe.path }}
+        port: {{ container.readiness_probe.port }}
+        {% if container.readiness_probe.httpHeaders %}
+        httpHeaders:
+          {% for name in container.readiness_probe.httpHeaders %}
+          - name: {{ name }}
+            value: {{ container.readiness_probe.httpHeaders[name] }}
+          {% endfor %}
+        {% endif %}
+      {% endif %}
+    initialDelaySeconds: {{ container.readiness_probe.delay }}
+    periodSeconds: {{ container.readiness_probe.period }}
+{% endif %}
 {% endfor %}
 
   volumes:
