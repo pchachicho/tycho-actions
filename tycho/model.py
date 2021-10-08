@@ -62,18 +62,25 @@ class Volumes:
        return self.volumes
 
 class Probe:
-    def __init__(self,cmd=None,delay=5,period=5):
+    def __init__(self,cmd=None,delay=None,period=None,threshold=None):
         self.cmd = cmd
         self.delay = delay
         self.period = period
+        self.threshold = threshold
 
 class HttpProbe(Probe):
-    def __init__(self,delay=5,period=5,httpGet=None):
-        Probe.__init__(self,None,delay,period)
+    def __init__(self,delay=None,period=None,threshold=None,httpGet=None):
+        Probe.__init__(self,None,delay,period,threshold)
         if httpGet != None:
            self.path = httpGet.get("path","/")
            self.port = httpGet.get("port",80)
            self.httpHeaders = httpGet.get("httpHeaders",None)
+
+class TcpProbe(Probe):
+    def __init__(self,delay=None,period=None,threshold=None,tcpSocket=None):
+        Probe.__init__(self,None,delay,period,threshold)
+        if tcpSocket != None:
+           self.port = tcpSocket.get("port",None)
 
 class Container:
     """ Invocation of an image in a specific infastructural context. """
@@ -129,10 +136,14 @@ class Container:
         self.volumes = volumes
         if liveness_probe != None and liveness_probe.get('httpGet',None) != None:
             self.liveness_probe = HttpProbe(**liveness_probe)
+        elif liveness_probe != None and liveness_probe.get('tcpSocket',None) != None:
+            self.liveness_probe = TcpProbe(**liveness_probe)
         elif liveness_probe != None:
             self.liveness_probe = Probe(**liveness_probe)
         if readiness_probe != None and readiness_probe.get('httpGet',None) != None:
             self.readiness_probe = HttpProbe(**readiness_probe)
+        elif readiness_probe != None and readiness_probe.get('tcpSocket',None) != None:
+            self.readiness_probe = TcpProbe(**readiness_probe)
         elif readiness_probe != None:
             self.readiness_probe = Probe(**readiness_probe)
         self.security_context = securityContext
