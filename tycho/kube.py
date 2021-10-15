@@ -411,7 +411,8 @@ class KubernetesCompute(Compute):
                 }
                 logger.debug(f"-- pod-resources {pod_resources}")
 
-                item_guid = item.metadata.labels.get ("tycho-guid", None)
+                item_guid = item.metadata.labels.get("tycho-guid", None)
+                item_username = item.metadata.labels.get("username", None)
 
                 """ Get the creation timestamp"""
                 c_time = item.metadata.creation_timestamp
@@ -432,6 +433,7 @@ class KubernetesCompute(Compute):
                         "ip_address": ip_address,
                         "port": str(port),
                         "creation_time": time,
+                        "username": item_username,
                         "utilization": pod_resources,
                         "workspace_name": workspace_name
                     }

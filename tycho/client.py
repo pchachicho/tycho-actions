@@ -30,13 +30,14 @@ class TychoService:
     """ Represent a service endpoint. """
     try_minikube = True
 
-    def __init__(self, name, app_id, ip_address, port, sid=None, creation_time=None, utilization={}, conn_string="", workspace_name=""):
+    def __init__(self, name, app_id, ip_address, port, sid=None, creation_time=None, username="",utilization={}, conn_string="", workspace_name=""):
         self.name = name
         self.app_id = app_id
         self.ip_address = ip_address
         self.port = port
         self.identifier = sid
         self.creation_time = creation_time
+        self.username = username
         self.utilization = utilization
         self.total_util = self.get_utilization (utilization)
         self.conn_string = conn_string
@@ -65,7 +66,7 @@ class TychoService:
 
     def __repr__(self):
         b = f"id: {self.identifier} time: {self.creation_time} util: {self.utilization}"
-        return f"name: {self.name} ip: {self.ip_address} port: {self.port} {b}"
+        return f"name: {self.name} ip: {self.ip_address} port: {self.port} user:{self.username} {b}"
 
 
 class TychoStatus:
