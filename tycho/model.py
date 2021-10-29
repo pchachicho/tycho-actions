@@ -334,8 +334,12 @@ class System:
             env_from_spec = (spec.get('env', []) or spec.get('environment', []))
             env_from_registry = [f"{ev}={os.environ.get('STDNFS_PVC')}" if '$STDNFS' in env[ev] else f"{ev}={env[ev]}" for ev in env]
             env_all = env_from_spec + env_from_registry
-            liveness_probe = spec.get('livenessProbe',None)
-            readiness_probe = spec.get('readinessProbe',None)
+            if spec.get("ext",None) != None and spec.get("ext").get("kube",None) != None:
+                liveness_probe = spec["ext"]["kube"].get('livenessProbe',None)
+                readiness_probe = spec["ext"]["kube"].get('readinessProbe',None)
+            else:
+                liveness_probe = None
+                readiness_probe = None
             containers.append({
                 "name": cname,
                 "image": spec['image'],

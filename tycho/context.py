@@ -6,6 +6,7 @@ import requests_cache
 import traceback
 import uuid
 import yaml
+from deepmerge import always_merger
 from requests_cache import CachedSession
 from string import Template
 from tycho.client import TychoClientFactory, TychoStatus, TychoSystem, TychoClient
@@ -65,8 +66,13 @@ class TychoContext:
         for base in context.get ("extends", []):
             self.inherit (contexts, contexts[base], apps)
         apps.update (context.get ("apps", {}))
+        for mixer in context.get("mixin", []):
+            for app in apps:
+                if contexts.get(mixer,None) != None and contexts[mixer].get("apps",None) != None:
+                    logger.info("mixing " + app)
+                    always_merger.merge(apps[app],contexts[mixer]["apps"].get(app))
         return apps
-    
+
     def _grok (self):
         """ Compile the registry, resolving text substituations, etc. """
         apps = {}
@@ -90,7 +96,6 @@ class TychoContext:
         context = contexts[self.product]
         logger.debug (f"---------------> {context}")
         apps = self.inherit (contexts=contexts, context=context)
-        
         """ Load the repository map to enable string interpolation. """
         repository_map = {
             key : value['url']
@@ -219,6 +224,7 @@ class TychoContext:
         principal_params_json = json.dumps(principal_params, indent=4)
         """ Security Context that are set for the app """
         spec["services"][app_id]["securityContext"] = self.apps[app_id]["securityContext"] if 'securityContext' in self.apps[app_id].keys() else None
+        spec["services"][app_id]["ext"] = self.apps[app_id]["ext"] if 'ext' in self.apps[app_id].keys() else None
         spec["services"][app_id].update(resource_request)
         """ Certain apps might require appending a string to the custom URL. """
         conn_string = self.apps.get(app_id).get("conn_string", "")

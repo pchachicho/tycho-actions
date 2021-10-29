@@ -55,8 +55,23 @@ repositories:
 contexts:
   # The common context provides a convenient base set of applications.
   # Other contexts can extend it to include these apps.
+  sys:
+    apps:
+      jupyter-ds:
+        ext:
+          kube:
+            livenessProbe:
+              cmd: ["pgrep", "jupyter" ]
+              delay: 5
+              period: 5
+            readinessProbe:
+              httpGet:
+                path: /private/jupyter-ds/{{ username }}/{{ identifier }}
+                port: 8888
   common: 
     name: HeLx Common App Registry
+    mixin:
+      - sys
     apps:
       jupyter-ds:
         name: Jupyter Data Science
