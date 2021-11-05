@@ -269,15 +269,22 @@ class System:
         principal = json.loads(principal)
         identifier = System.get_identifier()
         containers = []
-        if env:
+        if env != None:
             env['identifier'] = identifier
             env['username'] = principal.get('username',"Unknown")
+            system_port = None
+            for cname,spec in system.get('services',{}).items():
+                 env['system_name'] = cname
+                 for p in spec.get('ports', []):
+                     if ':' in p: system_port = p.split(':')[1]
+                     else: system_port = p
+                     break
+            if system_port != None: env['system_port'] = system_port
+            else: env['system_port'] = 8000
             logger.debug ("applying environment settings.")
             system_template = yaml.dump (system)
             logger.debug (json.dumps(env,indent=2))
-            system_rendered = TemplateUtils.render_text (
-                template_text=system_template,
-                context=env)
+            system_rendered = TemplateUtils.render_text(template_text=system_template,context=env)
             logger.debug (f"applied settings:\n {system_rendered}")
             for system_render in system_rendered:
                 system = system_render
@@ -337,6 +344,8 @@ class System:
             if spec.get("ext",None) != None and spec.get("ext").get("kube",None) != None:
                 liveness_probe = spec["ext"]["kube"].get('livenessProbe',None)
                 readiness_probe = spec["ext"]["kube"].get('readinessProbe',None)
+                if isinstance(liveness_probe,str) and liveness_probe == "none": liveness_probe = None
+                if isinstance(readiness_probe,str) and readiness_probe == "none": readiness_probe = None
             else:
                 liveness_probe = None
                 readiness_probe = None

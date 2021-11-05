@@ -64,10 +64,18 @@ contexts:
               cmd: ["pgrep", "jupyter" ]
               delay: 5
               period: 5
-            readinessProbe:
-              httpGet:
-                path: /private/jupyter-ds/{{ username }}/{{ identifier }}
-                port: 8888
+      jupyter-education:
+        ext:
+          kube:
+            livenessProbe:
+              cmd: ["pgrep", "jupyter" ]
+              delay: 5
+              period: 5
+      cloud-top:
+        ext:
+          kube:
+            readinessProbe: none
+              
   common: 
     name: HeLx Common App Registry
     mixin:
@@ -246,6 +254,8 @@ contexts:
     name: NIH HEAL Initiative
   eduhelx:
     name: UNC Helx for Education
+    mixin:
+      - sys
     apps:
       jupyter-education:
         name: Jupyter Data Science for Education
