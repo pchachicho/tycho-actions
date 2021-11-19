@@ -172,6 +172,72 @@ spec:
   {% endif %}
   {% endfor %}
   {% endif %}
+{% if container.liveness_probe %}
+    livenessProbe:
+      {% if container.liveness_probe.cmd %}
+      exec:
+        command:
+          {% for arg in container.liveness_probe.cmd %}
+          - {{ arg }}
+          {% endfor %}
+      {% elif container.liveness_probe.port and container.liveness_probe.path %}
+      httpGet:
+        path: {{ container.liveness_probe.path }}
+        port: {{ container.liveness_probe.port }}
+        {% if container.liveness_probe.httpHeaders %}
+        httpHeaders:
+          {% for name in container.liveness_probe.httpHeaders %}
+          - name: {{ name }}
+            value: {{ container.liveness_probe.httpHeaders[name] }}
+          {% endfor %}
+        {% endif %}
+      {% elif container.liveness_probe.port %}
+      tcpSocket:
+        port: {{ container.liveness_probe.port }}
+      {% endif %}
+    {% if container.liveness_probe.delay %}
+    initialDelaySeconds: {{ container.liveness_probe.delay }}
+    {% endif %}
+    {% if container.liveness_probe.period %}
+    periodSeconds: {{ container.liveness_probe.period }}
+    {% endif %}
+    {% if container.liveness_probe.threshold %}
+    failureThreshold: {{ container.liveness_probe.threshold }}
+    {% endif %}
+{% endif %}
+{% if container.readiness_probe %}
+    readinessProbe:
+      {% if container.readiness_probe.cmd %}
+      exec:
+        command:
+          {% for arg in container.readiness_probe.cmd %}
+          - {{ arg }}
+          {% endfor %}
+      {% elif container.readiness_probe.port and container.readiness_probe.path %}
+      httpGet:
+        path: {{ container.readiness_probe.path }}
+        port: {{ container.readiness_probe.port }}
+        {% if container.readiness_probe.httpHeaders %}
+        httpHeaders:
+          {% for name in container.readiness_probe.httpHeaders %}
+          - name: {{ name }}
+            value: {{ container.readiness_probe.httpHeaders[name] }}
+          {% endfor %}
+        {% endif %}
+      {% elif container.readiness_probe.port %}
+      tcpSocket:
+        port: {{ container.readiness_probe.port }}
+      {% endif %}
+    {% if container.readiness_probe.delay %}
+    initialDelaySeconds: {{ container.readiness_probe.delay }}
+    {% endif %}
+    {% if container.readiness_probe.period %}
+    periodSeconds: {{ container.readiness_probe.period }}
+    {% endif %}
+    {% if container.readiness_probe.threshold %}
+    failureThreshold: {{ container.readiness_probe.threshold }}
+    {% endif %}
+{% endif %}
 {% endfor %}
 
   volumes:

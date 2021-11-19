@@ -6,12 +6,20 @@ import requests_cache
 import traceback
 import uuid
 import yaml
+import copy
+from deepmerge import Merger
 from requests_cache import CachedSession
 from string import Template
 from tycho.client import TychoClientFactory, TychoStatus, TychoSystem, TychoClient
 from tycho.exceptions import ContextException
 
 logger = logging.getLogger (__name__)
+
+mixin_merge = Merger(
+    [ (list,["override"]), (dict,["merge"]), (set,["union"]) ],
+    ["override"],
+    ["override"]
+)
 
 class Principal:
     """ Abstract representation of a system identity. """
@@ -32,8 +40,11 @@ class TychoContext:
     """
     
     """ https://github.com/heliumdatacommons/CommonsShare_AppStore/blob/master/CS_AppsStore/cloudtop_imagej/deployment.py """
-    def __init__(self, registry_config="app-registry.yaml", product="common", stub=False):
-        self.registry = self._get_registry (registry_config, product=product)
+    def __init__(self, registry_config="app-registry.yaml", app_defaults_config="app-defaults.yaml",product="common", stub=False):
+        self.registry = self._get_config(registry_config)
+        self.app_defaults = self._get_config(app_defaults_config)
+        logger.info("defaults = ")
+        logger.info(self.app_defaults)
         """ Uncomment this and related lines when this code goes live,. 
         Use a timeout on the API so the unit tests are not slowed down. """
         if not os.environ.get ('DEV_PHASE') == 'stub':
@@ -42,17 +53,17 @@ class TychoContext:
         self.apps = self._grok ()
         self.http_session = CachedSession (cache_name='tycho-registry')
 
-    def _get_registry (self, file_name, product="common"):
+    def _get_config(self, file_name):
         """ Load the registry metadata. """
-        registry = {}
+        config = {}
         """ Load it from the Tycho conf directory for now. Perhaps more dynamic in the future. """
-        registry_config = os.path.join (
+        config_path = os.path.join (
             os.path.dirname (__file__),
             "conf",
             file_name)
-        with open(registry_config, 'r') as stream:
-            registry = yaml.safe_load (stream)
-        return registry
+        with open(config_path, 'r') as stream:
+            config = yaml.safe_load (stream)
+        return config
 
     def add_conf_impl(self, apps, context):
         for key, value in context.items():
@@ -64,9 +75,23 @@ class TychoContext:
     def inherit (self, contexts, context, apps={}):
         for base in context.get ("extends", []):
             self.inherit (contexts, contexts[base], apps)
-        apps.update (context.get ("apps", {}))
+        apps.update (copy.deepcopy(context.get ("apps", {})))
         return apps
     
+    def mixin_defaults(self,apps):
+        for app in apps:
+            apps[app] = mixin_merge.merge(copy.deepcopy(apps[app]),copy.deepcopy(self.app_defaults))
+    
+    def mixin(self,contexts,context,apps):
+        for base in context.get ("extends", []):
+            self.mixin(contexts,contexts[base],apps)
+        for mixer in context.get("mixin", []):
+            for app in apps:
+                if contexts.get(mixer,None) != None and contexts[mixer].get("apps",None) != None and contexts[mixer]["apps"].get(app,None) != None:
+                    logger.info("mixing " + app)
+                    apps[app] = mixin_merge.merge(copy.deepcopy(apps[app]),copy.deepcopy(contexts[mixer]["apps"].get(app))) 
+        return apps
+
     def _grok (self):
         """ Compile the registry, resolving text substituations, etc. """
         apps = {}
@@ -90,7 +115,8 @@ class TychoContext:
         context = contexts[self.product]
         logger.debug (f"---------------> {context}")
         apps = self.inherit (contexts=contexts, context=context)
-        
+        self.mixin_defaults(apps)
+        self.mixin(contexts,context,apps)
         """ Load the repository map to enable string interpolation. """
         repository_map = {
             key : value['url']
@@ -104,7 +130,7 @@ class TychoContext:
                     raise ValueError ("No spec URL and no repositories specified.")
                 repo_url = repos[0][1]
                 dockstore_branch = os.environ.get("DOCKSTORE_APPS_BRANCH", "master")
-                if dockstore_branch == "develop":
+                if dockstore_branch != "master":
                     repo_url = repo_url.replace("master", dockstore_branch)
                 app['spec'] = f"{repo_url}/{name}/docker-compose.yaml"
             spec_url = app['spec']
@@ -117,7 +143,8 @@ class TychoContext:
         logger.debug (f"-- product {self.product} resolution => apps: {apps.keys()}")
         apps = self.add_conf_impl(apps, context)
         for app, value in apps.items():
-            print(f"app: ", value)
+            logger.debug("app:" + app)
+            logger.debug(value)
         return apps
     
     def get_definition(self, app_id):
@@ -219,6 +246,7 @@ class TychoContext:
         principal_params_json = json.dumps(principal_params, indent=4)
         """ Security Context that are set for the app """
         spec["services"][app_id]["securityContext"] = self.apps[app_id]["securityContext"] if 'securityContext' in self.apps[app_id].keys() else None
+        spec["services"][app_id]["ext"] = self.apps[app_id]["ext"] if 'ext' in self.apps[app_id].keys() else None
         spec["services"][app_id].update(resource_request)
         """ Certain apps might require appending a string to the custom URL. """
         conn_string = self.apps.get(app_id).get("conn_string", "")
@@ -260,8 +288,8 @@ class NullContext (TychoContext):
     """
     A null context to facilitate client development.
     """
-    def __init__(self, registry_config="app-registry.yaml", product="common"):
-        super ().__init__(product=product, stub=True)
+    def __init__(self,product="common"):
+        super ().__init__(product=product,stub=True)
 
     def status(self, request=None):
         """ Make up some rows. """

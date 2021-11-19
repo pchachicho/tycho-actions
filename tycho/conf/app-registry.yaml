@@ -55,8 +55,31 @@ repositories:
 contexts:
   # The common context provides a convenient base set of applications.
   # Other contexts can extend it to include these apps.
+  sys:
+    apps:
+      jupyter-ds:
+        ext:
+          kube:
+            livenessProbe:
+              cmd: ["pgrep", "jupyter" ]
+              delay: 5
+              period: 5
+      jupyter-education:
+        ext:
+          kube:
+            livenessProbe:
+              cmd: ["pgrep", "jupyter" ]
+              delay: 5
+              period: 5
+      cloud-top:
+        ext:
+          kube:
+            readinessProbe: none
+              
   common: 
     name: HeLx Common App Registry
+    mixin:
+      - sys
     apps:
       jupyter-ds:
         name: Jupyter Data Science
@@ -261,6 +284,8 @@ contexts:
         count: 1
   eduhelx:
     name: UNC Helx for Education
+    mixin:
+      - sys
     apps:
       jupyter-education:
         name: Jupyter Data Science for Education
