@@ -8,9 +8,9 @@ metadata:
 spec:
   containers:
   - name: jnlp
-    workingDir: /tmp/jenkins
+    workingDir: /home/jenkins/agent
   - name: kaniko
-    workingDir: /tmp/jenkins
+    workingDir: /home/jenkins/agent
     image: gcr.io/kaniko-project/executor:debug
     imagePullPolicy: Always
     command:
@@ -52,7 +52,6 @@ spec:
             steps {
                 container(name: 'kaniko', shell: '/busybox/sh') {
                     sh '''
-                    echo $DOCKERHUB_CREDS_PSW | docker login -u $DOCKERHUB_CREDS_USR --password-stdin
                     make buildAndPush
                     '''
                 }
