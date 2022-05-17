@@ -51,7 +51,7 @@ spec:
                 VERSION = "develop-v.0.0.91"
             }
             steps {
-                container(name: 'kaniko-build-agent', shell: '/busybox/sh') {
+                container(name: 'kaniko', shell: '/busybox/sh') {
                     sh '''
                     echo $DOCKERHUB_CREDS_PSW | docker login -u $DOCKERHUB_CREDS_USR --password-stdin
                     make buildAndPush
