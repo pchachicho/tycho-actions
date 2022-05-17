@@ -43,9 +43,6 @@ spec:
         //     }
         // }
         stage('Build and Push') {
-            when {
-                buildingTag()
-            }
             environment {
                 PATH = "/busybox:/kaniko:$PATH"
                 DOCKERHUB_CREDS = credentials("${env.REGISTRY_CREDS_ID_STR}")
