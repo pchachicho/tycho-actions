@@ -13,6 +13,15 @@ spec:
     workingDir: /home/jenkins/agent
     image: gcr.io/kaniko-project/executor:debug
     imagePullPolicy: Always
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "1024Mi"
+        ephemeral-storage: "768Mi"
+      limits:
+        cpu: "1000m"
+        memory: "1024Mi"
+        ephemeral-storage: "1024Mi"
     command:
     - /busybox/cat
     tty: true
