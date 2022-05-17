@@ -33,15 +33,6 @@ spec:
         }
     }
     stages {
-        stage('Install') {
-            steps {
-	        container(name: 'kaniko-build-agent', shell: '/busybox/sh') {
-                    sh '''
-                    make install
-                    '''
-                }
-            }
-        }
         // stage('Test') {
         //     steps {
         //         container('kaniko-build-agent') {
