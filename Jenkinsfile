@@ -46,13 +46,14 @@ spec:
                 PATH = "/busybox:/kaniko:$PATH"
                 DOCKERHUB_CREDS = credentials("${env.REGISTRY_CREDS_ID_STR}")
                 DOCKER_REGISTRY = "${env.DOCKER_REGISTRY}"
-                BUILD_NUMBER = "${env.BUILD_NUMBER}"
-                VERSION = "develop-v.0.0.91"
             }
             steps {
                 container(name: 'kaniko', shell: '/busybox/sh') {
                     sh '''
-                    make buildAndPush
+                    /kaniko/executor --dockerfile Dockerfile \
+                        --context . \
+                        --verbosity debug \
+                        --destination helxplatform/tycho-api:develop-v.0.0.91-${env.BUILD_NUMBER}
                     '''
                 }
             }
