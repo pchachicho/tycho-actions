@@ -1,7 +1,6 @@
 PYTHON         := /usr/bin/env python3
-VERSION_FILE 	= ./tycho/__init__.py
-VERSION      	= $(shell cut -d " " -f 3 ${VERSION_FILE})
-REGISTRY 		= docker.io
+# VERSION_FILE 	= ./tycho/__init__.py
+# VERSION      	= $(shell cut -d " " -f 3 ${VERSION_FILE})
 APP_OWNER 		= helxplatform
 APP_NAME	 	= tycho-api
 IMAGE_NAME	 	= ${APP_OWNER}/${APP_NAME}
@@ -35,4 +34,4 @@ test:
 	${PYTHON} -m pytest tests
 
 buildAndPush:
-	/kaniko/executor --dockerfile Dockerfile --context . --verbosity debug --destination ${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
+	/kaniko/executor --dockerfile Dockerfile --context . --verbosity debug --destination ${IMAGE_NAME}:${IMAGE_TAG}
