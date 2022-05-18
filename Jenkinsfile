@@ -45,7 +45,7 @@ spec:
         //     steps {
         //         container('kaniko-build-agent') {
         //             sh '''
-        //             make test
+        //             /usr/bin/env python3 -m pytest tests
         //             '''
         //         }
         //     }
@@ -60,7 +60,10 @@ spec:
             steps {
                 container(name: 'kaniko', shell: '/busybox/sh') {
                     sh '''
-                    /kaniko/executor --dockerfile Dockerfile --context . --verbosity debug --destination helxplatform/tycho-api:develop-v.0.0.91-$BUILD_NUMBER
+                    /kaniko/executor --dockerfile Dockerfile \
+                        --context . \
+                        --verbosity debug \
+                        --destination helxplatform/tycho-api:develop-v.0.0.91-$BUILD_NUMBER
                     '''
                 }
             }

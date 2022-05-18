@@ -22,11 +22,11 @@ clean:
 	${PYTHON} -m pip uninstall -y -r requirements.txt
 
 install:
-	/usr/bin/env python3 -m pip install --upgrade pip
-	/usr/bin/env python3 -m pip install --upgrade wheel
-	/usr/bin/env python3 -m pip install --upgrade setuptools
-	/usr/bin/env python3 -m pip install -r requirements.txt
-	/usr/bin/env python3 -m pip install .
+	${PYTHON} -m pip install --upgrade pip
+	${PYTHON} -m pip install --upgrade wheel
+	${PYTHON} -m pip install --upgrade setuptools
+	${PYTHON} -m pip install -r requirements.txt
+	${PYTHON} -m pip install .
 
 #test: Run all tests
 test:
