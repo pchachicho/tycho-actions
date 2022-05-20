@@ -62,7 +62,6 @@ spec:
                     sh '''
                     /kaniko/executor --dockerfile Dockerfile \
                         --context . \
-                        --verbosity debug \
                         --destination helxplatform/tycho-api:develop-v.0.0.91-$BUILD_NUMBER
                     '''
                 }

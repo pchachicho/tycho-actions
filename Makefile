@@ -1,10 +1,11 @@
-PYTHON         := /usr/bin/env python3
-# VERSION_FILE 	= ./tycho/__init__.py
-# VERSION      	= $(shell cut -d " " -f 3 ${VERSION_FILE})
-APP_OWNER 		= helxplatform
-APP_NAME	 	= tycho-api
-IMAGE_NAME	 	= ${APP_OWNER}/${APP_NAME}
-IMAGE_TAG   	= "${VERSION}-${BUILD_NUMBER}"
+PYTHON       := /usr/bin/env python3
+VERSION_FILE = ./tycho/__init__.py
+VERSION      = $(shell cut -d " " -f 3 ${VERSION_FILE})
+DOCKER_REPO  = docker.io
+DOCKER_OWNER = helxplatform
+DOCKER_APP	 = tycho-api
+DOCKER_TAG   = ${VERSION}
+DOCKER_IMAGE = ${DOCKER_OWNER}/${DOCKER_APP}:$(DOCKER_TAG)
 
 .DEFAULT_GOAL = help
 
@@ -32,3 +33,10 @@ install:
 test:
 	# ${PYTHON} -m flake8 src
 	${PYTHON} -m pytest tests
+
+build:
+	docker build -t ${DOCKER_IMAGE} -f Dockerfile .
+
+publish: build
+	docker tag ${DOCKER_IMAGE} ${DOCKER_REPO}/${DOCKER_IMAGE}
+	docker push ${DOCKER_REPO}/${DOCKER_IMAGE}
