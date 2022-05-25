@@ -75,6 +75,10 @@ contexts:
         ext:
           kube:
             readinessProbe: none
+      scout:
+        ext:
+          kube:
+            readinessProbe: none
               
   common: 
     name: HeLx Common App Registry
