@@ -75,7 +75,22 @@ contexts:
         ext:
           kube:
             readinessProbe: none
-              
+      scout:
+        ext:
+          kube:
+            readinessProbe: none
+      imagej:
+        ext:
+          kube:
+            readinessProbe: none
+      napari:
+        ext:
+          kube:
+            readinessProbe: none
+      octave:
+        ext:
+          kube:
+            readinessProbe: none              
   common: 
     name: HeLx Common App Registry
     mixin:
@@ -142,6 +157,14 @@ contexts:
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
           cloud-top : 8080
+        count: 1
+      scout:
+        name: Scout
+        description: SCOUT is an open-source Python package for performing volumetric image analysis of intact cerebral organoids.
+        details: A Ubuntu graphical desktop environment for experimenting with SCOUT application in the cloud.
+        docs: https://chunglabmit.github.io/scout/#
+        services:
+          scout : 8080
         count: 1            
   catalyst:
     extends:
