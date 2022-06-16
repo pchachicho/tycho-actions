@@ -51,12 +51,50 @@ repositories:
   helx_apps:
     # This is the Dockstore app prototype repository. GA4GH TRS in future?
     description: Main repository for HeLx Apps and Tools
-    url: https://github.com/helxplatform/app-support-prototype/raw/master/dockstore-yaml-proposals
+    url: https://github.com/helxplatform/helx-apps/raw/master/app-specs
 contexts:
   # The common context provides a convenient base set of applications.
   # Other contexts can extend it to include these apps.
+  sys:
+    apps:
+      jupyter-ds:
+        ext:
+          kube:
+            livenessProbe:
+              cmd: ["pgrep", "jupyter" ]
+              delay: 5
+              period: 5
+      jupyter-education:
+        ext:
+          kube:
+            livenessProbe:
+              cmd: ["pgrep", "jupyter" ]
+              delay: 5
+              period: 5
+      cloud-top:
+        ext:
+          kube:
+            readinessProbe: none
+      scout:
+        ext:
+          kube:
+            readinessProbe: none
+      imagej:
+        ext:
+          kube:
+            readinessProbe: none
+      napari:
+        ext:
+          kube:
+            readinessProbe: none
+      octave:
+        ext:
+          kube:
+            readinessProbe: none              
   common: 
     name: HeLx Common App Registry
+    mixin:
+      - sys
     apps:
       jupyter-ds:
         name: Jupyter Data Science
@@ -119,6 +157,14 @@ contexts:
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
           cloud-top : 8080
+        count: 1
+      scout:
+        name: SCOUT
+        description: SCOUT is an open-source Python package for performing volumetric image analysis of intact cerebral organoids.
+        details: A Ubuntu graphical desktop environment for experimenting with SCOUT application in the cloud.
+        docs: https://chunglabmit.github.io/scout/#
+        services:
+          scout : 8080
         count: 1            
   catalyst:
     extends:
@@ -261,6 +307,8 @@ contexts:
         count: 1
   eduhelx:
     name: UNC Helx for Education
+    mixin:
+      - sys
     apps:
       jupyter-education:
         name: Jupyter Data Science for Education

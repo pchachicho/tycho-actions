@@ -3,6 +3,7 @@ import logging
 import ipaddress
 import json
 import os
+from typing import OrderedDict
 import uuid
 import yaml
 import traceback
@@ -60,6 +61,26 @@ class Volumes:
                    raise Exception(f"Wrong Volume definition in Container:{container['name']} and Volume:{volume}")
        return self.volumes
 
+class Probe:
+    def __init__(self,cmd=None,delay=None,period=None,threshold=None):
+        self.cmd = cmd
+        self.delay = delay
+        self.period = period
+        self.threshold = threshold
+
+class HttpProbe(Probe):
+    def __init__(self,delay=None,period=None,threshold=None,httpGet=None):
+        Probe.__init__(self,None,delay,period,threshold)
+        if httpGet != None:
+           self.path = httpGet.get("path","/")
+           self.port = httpGet.get("port",80)
+           self.httpHeaders = httpGet.get("httpHeaders",None)
+
+class TcpProbe(Probe):
+    def __init__(self,delay=None,period=None,threshold=None,tcpSocket=None):
+        Probe.__init__(self,None,delay,period,threshold)
+        if tcpSocket != None:
+           self.port = tcpSocket.get("port",None)
 
 class Container:
     """ Invocation of an image in a specific infastructural context. """
@@ -75,7 +96,9 @@ class Container:
                  expose=[],
                  depends_on=None,
                  volumes=None,
-                 securityContext=None):
+                 securityContext=None,
+                 liveness_probe=None,
+                 readiness_probe=None):
         """ Construct a container.
         
             :param name: Name the running container will be given.
@@ -111,15 +134,28 @@ class Container:
                    list(map(lambda v : list(map(lambda r: str(r), v.split('='))), env)) \
                    if env else []
         self.volumes = volumes
+        if liveness_probe != None and liveness_probe.get('httpGet',None) != None:
+            self.liveness_probe = HttpProbe(**liveness_probe)
+        elif liveness_probe != None and liveness_probe.get('tcpSocket',None) != None:
+            self.liveness_probe = TcpProbe(**liveness_probe)
+        elif liveness_probe != None:
+            self.liveness_probe = Probe(**liveness_probe)
+        if readiness_probe != None and readiness_probe.get('httpGet',None) != None:
+            self.readiness_probe = HttpProbe(**readiness_probe)
+        elif readiness_probe != None and readiness_probe.get('tcpSocket',None) != None:
+            self.readiness_probe = TcpProbe(**readiness_probe)
+        elif readiness_probe != None:
+            self.readiness_probe = Probe(**readiness_probe)
         self.security_context = securityContext
 
     def __repr__(self):
         return f"name:{self.name} image:{self.image} id:{self.identity} limits:{self.limits}"
 
 
+
 class System:
     """ Distributed system of interacting containerized software. """
-    def __init__(self, config, name, principal, service_account, conn_string, proxy_rewrite_rule, containers, services={}):
+    def __init__(self, config, name, principal, service_account, conn_string, proxy_rewrite_rule, containers, identifier, services={}):
         """ Construct a new abstract model of a system given a name and set of containers.
         
             Serves as context for the generation of compute cluster specific artifacts.
@@ -132,7 +168,7 @@ class System:
             :type containers: list of containers
         """
         self.config = config
-        self.identifier = uuid.uuid4().hex
+        self.identifier = identifier
         self.system_name = name
         self.amb = False
         self.dev_phase = os.getenv('DEV_PHASE', "prod")
@@ -141,6 +177,7 @@ class System:
         containers_exist = len(containers) > 0
         none_are_null = not any([ c for c in containers if c == None ])
         assert containers_exist and none_are_null, "System container elements may not be null."
+        logger.info(f"=======> Constructing system from containers = {containers}")
         self.containers = list(map(lambda v : Container(**v), containers)) \
                           if isinstance(containers[0], dict) else \
                              containers
@@ -183,6 +220,10 @@ class System:
 
     def _get_ambassador_id(self):
         return os.environ.get("AMBASSADOR_ID", "")
+    
+    @staticmethod
+    def get_identifier():
+        return uuid.uuid4().hex
 
     def _get_init_resources(self):
         resources = self.config.get('tycho')['compute']['system']['defaults']['services']['init']['resources']
@@ -226,14 +267,24 @@ class System:
             :param services: Service specifications - networking configuration.
         """
         principal = json.loads(principal)
+        identifier = System.get_identifier()
         containers = []
-        if env:
+        if env != None:
+            env['identifier'] = identifier
+            env['username'] = principal.get('username',"Unknown")
+            system_port = None
+            for cname,spec in system.get('services',{}).items():
+                 env['system_name'] = cname
+                 for p in spec.get('ports', []):
+                     if ':' in p: system_port = p.split(':')[1]
+                     else: system_port = p
+                     break
+            if system_port != None: env['system_port'] = system_port
+            else: env['system_port'] = 8000
             logger.debug ("applying environment settings.")
             system_template = yaml.dump (system)
-            print (json.dumps(env,indent=2))
-            system_rendered = TemplateUtils.render_text (
-                template_text=system_template,
-                context=env)
+            logger.debug (json.dumps(env,indent=2))
+            system_rendered = TemplateUtils.render_text(template_text=system_template,context=env)
             logger.debug (f"applied settings:\n {system_rendered}")
             for system_render in system_rendered:
                 system = system_render
@@ -290,6 +341,14 @@ class System:
             env_from_spec = (spec.get('env', []) or spec.get('environment', []))
             env_from_registry = [f"{ev}={os.environ.get('STDNFS_PVC')}" if '$STDNFS' in env[ev] else f"{ev}={env[ev]}" for ev in env]
             env_all = env_from_spec + env_from_registry
+            if spec.get("ext",None) != None and spec.get("ext").get("kube",None) != None:
+                liveness_probe = spec["ext"]["kube"].get('livenessProbe',None)
+                readiness_probe = spec["ext"]["kube"].get('readinessProbe',None)
+                if isinstance(liveness_probe,str) and liveness_probe == "none": liveness_probe = None
+                if isinstance(readiness_probe,str) and readiness_probe == "none": readiness_probe = None
+            else:
+                liveness_probe = None
+                readiness_probe = None
             containers.append({
                 "name": cname,
                 "image": spec['image'],
@@ -301,12 +360,21 @@ class System:
                 "expose": expose,
                 "depends_on": spec.get("depends_on", []),
                 "volumes": [v for v in spec.get("volumes", [])],
-                "securityContext":  spec.get("securityContext", {})
+                "securityContext":  spec.get("securityContext", {}),
+                "liveness_probe": liveness_probe,
+                "readiness_probe": readiness_probe
             })
-        system_specification = {"config": config, "name": name, "principal": principal,
-                                "service_account": service_account, "conn_string": spec.get("conn_string", ""),
-                                "proxy_rewrite_rule": spec.get("proxy_rewrite_rule", False), "containers": containers,
-                                'services': services}
+        system_specification = {
+            "config": config,
+            "name": name,
+            "principal": principal,
+            "service_account": service_account,
+            "conn_string": spec.get("conn_string", ""),
+            "proxy_rewrite_rule": spec.get("proxy_rewrite_rule", False),
+            "containers": containers,
+            "identifier": identifier,
+            "services": services
+        }
         logger.debug (f"parsed-system: {json.dumps(system_specification, indent=2)}")
         system = System(**system_specification)
         system.source_text = yaml.dump (system)

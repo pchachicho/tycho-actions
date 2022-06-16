@@ -170,7 +170,6 @@ class KubernetesCompute(Compute):
             """ Turn an abstract system model into a cluster specific representation. """
             pod_manifests = system.render ("pod.yaml")
             #return {}
-            logger.info (f"=====================================> {pod_manifests}")
             #""" Render a persistent volume claim. """
             #pvc_manifests = system.render(template="pvc.yaml")
             #""" Create persistent volume claims. """
@@ -264,7 +263,6 @@ class KubernetesCompute(Compute):
             :returns: ip_address IP Address of the service.
             """
         ip_address = None if os.environ.get("DEV_PHASE", "prod") != "test" else "127.0.0.1"
-        print(ip_address)
         try:
             app_id = service_metadata.metadata.labels["tycho-app"]
             logger.info (f"-================================> *** {app_id}")
@@ -411,7 +409,8 @@ class KubernetesCompute(Compute):
                 }
                 logger.debug(f"-- pod-resources {pod_resources}")
 
-                item_guid = item.metadata.labels.get ("tycho-guid", None)
+                item_guid = item.metadata.labels.get("tycho-guid", None)
+                item_username = item.metadata.labels.get("username", None)
 
                 """ Get the creation timestamp"""
                 c_time = item.metadata.creation_timestamp
@@ -432,6 +431,7 @@ class KubernetesCompute(Compute):
                         "ip_address": ip_address,
                         "port": str(port),
                         "creation_time": time,
+                        "username": item_username,
                         "utilization": pod_resources,
                         "workspace_name": workspace_name
                     }
