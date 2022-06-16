@@ -159,7 +159,7 @@ contexts:
           cloud-top : 8080
         count: 1
       scout:
-        name: Scout
+        name: SCOUT
         description: SCOUT is an open-source Python package for performing volumetric image analysis of intact cerebral organoids.
         details: A Ubuntu graphical desktop environment for experimenting with SCOUT application in the cloud.
         docs: https://chunglabmit.github.io/scout/#
