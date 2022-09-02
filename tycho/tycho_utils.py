@@ -118,6 +118,7 @@ class Resource:
         return result
     
     def get_resource_obj (resource_name, format=None):
+        # TODO: Fix bug where format could be different than resource's file extension in file name
         result = None
         if not format:
             if resource_name.endswith ('.yaml'):
