@@ -15,12 +15,12 @@ class TestResource:
     ]
 
     @pytest.mark.parametrize("resource_name,format,correct_type", testdata)
-    def test_get_resource_obj(resource_name, format, correct_type):
+    def test_get_resource_obj(self, resource_name, format, correct_type, mocker):
         # Set up mocks
-        mock.patch('tycho.tycho_utils.Resource.get_resource_path', "")
-        mock.patch('os.path.exists', True)
-        mock.patch('tycho.tycho_utils.Resource.load_json', "json")
-        mock.patch('tycho.tycho_utils.Resource.load_yaml', "yaml")
+        mocker.patch('tycho.tycho_utils.Resource.get_resource_path', return_value="")
+        mocker.patch('os.path.exists', return_value=True)
+        mocker.patch('tycho.tycho_utils.Resource.load_json', return_value="json")
+        mocker.patch('tycho.tycho_utils.Resource.load_yaml', return_value="yaml")
 
         # Test get_resource_obj
         resource = Resource()
