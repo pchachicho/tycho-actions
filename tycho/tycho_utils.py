@@ -59,7 +59,7 @@ class TemplateUtils:
         template.globals['now'] = datetime.datetime.utcnow
         text = template.render (**context)
         logger.debug (text)
-        return yaml.load_all (text)
+        return yaml.load_all (text, Loader=yaml.SafeLoader)
 
     @staticmethod
     def apply_environment (environment, text):
