@@ -53,8 +53,8 @@ class Volumes:
                    volume_name = parts[1].split("/")[2:3][0]
                    pvc_name = volume_name if volume_name not in self.pvcs else None
                    self.pvcs.append(volume_name)
-                   path = parts[2] if len(parts) is 3 else None
-                   subpath = "/".join(parts[1].split("/")[3:]) if len(parts) is 3 else None
+                   path = parts[2] if len(parts) == 3 else None
+                   subpath = "/".join(parts[1].split("/")[3:]) if len(parts) == 3 else None
                    self.volume(container['name'], pvc_name, volume_name, path, subpath)
                else:
                    logger.debug(f"Volume definition should follow the pattern: pvc://<pvc_name>/<sub-path>:<container-path> or pvc://<sub-path>:<container-path>")

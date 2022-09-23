@@ -22,7 +22,7 @@ def get_sample_spec(name):
     d = os.path.dirname(__file__)
     sample_path = os.path.join(d, "../tycho", "sample", name, "docker-compose.yaml")
     with open(sample_path, "r") as stream:
-        result = yaml.load(stream)
+        result = yaml.load(stream, Loader=yaml.FullLoader)
     return result
 
 
