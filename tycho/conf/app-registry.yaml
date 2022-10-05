@@ -341,3 +341,22 @@ contexts:
         services:
           cloud-top: 8080
         count: 1
+  tracs:
+    name: TRACS
+    apps:
+      ohdsi:
+        name: OHDSI - Observational Health Data Sciences and Informatics
+        description: OHDSI program is a multi-stakeholder, interdisciplinary collaborative to bring out the value of health data through large-scale analytics
+        details: Includes Atlas, WebAPI, and Postgres.
+        docs: https://ohdsi.org/software-tools/
+        services:
+          ohdsi: "8081"
+        count: 1
+      cloud-top:
+        name: Cloud Top
+        description: CloudTop is a cloud native, browser accessible Linux desktop.
+        details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
+        docs: https://helxplatform.github.io/cloudtop-docs/
+        services:
+          cloud-top: 8080
+        count: 1
