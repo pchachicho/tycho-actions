@@ -108,6 +108,8 @@ spec:
       value: /
     {% endif %}
 {% endif %}
+    - name: HOST
+      value: {{ system.host }}
 {% if not container.env %}
     - name : GUID
       value: {{ system.identifier }}
@@ -130,6 +132,7 @@ spec:
     - name: {{ env }}
       value: {{ system.system_env[env]}}
   {% endfor %}
+    - name: 
 {% endif %}
 {% if container.expose|length > 0 %}
     ports:
