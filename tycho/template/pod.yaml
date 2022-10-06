@@ -132,7 +132,6 @@ spec:
     - name: {{ env }}
       value: {{ system.system_env[env]}}
   {% endfor %}
-    - name: 
 {% endif %}
 {% if container.expose|length > 0 %}
     ports:
