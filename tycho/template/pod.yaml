@@ -52,19 +52,14 @@ spec:
     {% if system.security_context.run_as_user and system.security_context.run_as_group %}
     command: [ 'sh', '-c' ]
     args:
-      - chmod 775 {{ system.parent_dir }}/{{ system.subpath_dir }} &&
-        chown -R {{ system.security_context.run_as_user }}:{{ system.security_context.run_as_group }} {{ system.parent_dir }}/{{ system.subpath_dir }} &&
-        chmod 775 {{ system.parent_dir }}/{{ system.shared_dir }} &&
-        chown -R {{ system.security_context.run_as_user }}:{{ system.security_context.run_as_group }} {{ system.parent_dir }}/{{ system.shared_dir }} &&
+      - mkdir -p {{ system.parent_dir }}/{{ system.subpath_dir }} &&
+        mkdir -p {{ system.parent_dir }}/{{ system.subpath_dir }} &&
+        ls -al {{ system.parent_dir }} &&
         echo OK
     {% endif %}
     volumeMounts:
     - name: {{ system.stdnfs_pvc }}
-      mountPath: {{ system.parent_dir }}/{{ system.subpath_dir }}
-      subPath: {{system.username}}
-    - name: {{ system.stdnfs_pvc }}
-      mountPath: {{ system.parent_dir }}/{{ system.shared_dir }}
-      subPath: {{ system.shared_dir }}
+      mountPath: {{ system.parent_dir }}
 {% endif %}
 {% endfor %}
   containers:
