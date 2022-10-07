@@ -391,7 +391,7 @@ class System:
             "containers": containers,
             "identifier": identifier,
             "services": services,
-            "security_context": security_context,
+            "security_context": security_context
         }
         logger.debug (f"parsed-system: {json.dumps(system_specification, indent=2)}")
         system = System(**system_specification)
