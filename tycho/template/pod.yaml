@@ -53,7 +53,7 @@ spec:
     command: [ 'sh', '-c' ]
     args:
       - mkdir -p {{ system.parent_dir }}/{{ system.subpath_dir }} &&
-        mkdir -p {{ system.parent_dir }}/{{ system.subpath_dir }} &&
+        mkdir -p {{ system.parent_dir }}/{{ system.shared_dir }} &&
         ls -al {{ system.parent_dir }} &&
         echo OK
     {% endif %}
