@@ -347,6 +347,8 @@ contexts:
         count: 1
   tracs:
     name: TraCS
+    mixin:
+      - sys
     apps:
       ohdsi:
         name: OHDSI - Observational Health Data Sciences and Informatics
