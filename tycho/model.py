@@ -198,7 +198,7 @@ class System:
         self.annotations = {}
         self.namespace = "default"
         self.serviceaccount = service_account
-        self.enable_volume_permissions_init_container = os.environ.get("TYCHO_APP_ENABLE_VOLUME_PERMISSIONS_INIT_CONTAINER", "false")
+        self.enable_init_container = os.environ.get("TYCHO_APP_ENABLE_VOLUME_PERMISSIONS_INIT_CONTAINER", "false")
         self.conn_string = conn_string
         """PVC flags and other variables for default volumes"""
         self.create_home_dirs = os.environ.get("CREATE_HOME_DIRS", "false").lower()
