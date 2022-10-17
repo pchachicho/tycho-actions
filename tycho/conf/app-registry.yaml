@@ -173,7 +173,7 @@ contexts:
         services:
           scout : 8080
         count: 1            
-  catalyst:
+  bdc:
     extends:
       - common
       - blackbalsam
