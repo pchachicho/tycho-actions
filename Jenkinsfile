@@ -31,22 +31,29 @@ spec:
     volumeMounts:
     - name: jenkins-docker-cfg
       mountPath: /kaniko/.docker
-  - name: crane
-    workingDir: /tmp/jenkins
-    image: gcr.io/go-containerregistry/crane:debug
+  - name: go
+    workingDir: /home/jenkins/agent
+    image: golang:1.19.1
     imagePullPolicy: Always
+    resources:
+      requests:
+        cpu: "512m"
+        memory: "512Mi"
+        ephemeral-storage: "1Gi"
+      limits:
+        cpu: "512m"
+        memory: "1024Mi"
+        ephemeral-storage: "1Gi"
     command:
-    - /busybox/cat
+    - /bin/bash
     tty: true
   volumes:
   - name: jenkins-docker-cfg
-    projected:
-      sources:
-      - secret:
-          name: rencibuild-imagepull-secret
-          items:
-            - key: .dockerconfigjson
-              path: config.json
+    secret:
+      secretName: rencibuild-imagepull-secret
+      items:
+      - key: .dockerconfigjson
+        path: config.json
 """
         }
     }
@@ -55,60 +62,31 @@ spec:
         DOCKERHUB_CREDS = credentials("${env.CONTAINERS_REGISTRY_CREDS_ID_STR}")
         REGISTRY = "${env.REGISTRY}"
         REG_OWNER="helxplatform"
-        REG_APP="tycho"
+        REPO_NAME="tycho"
         COMMIT_HASH="${sh(script:"git rev-parse --short HEAD", returnStdout: true).trim()}"
-        VERSION_FILE="./tycho/__init__.py"
-        VERSION="${sh(script:'awk \'{ print $3 }\' ./tycho/__init__.py | xargs', returnStdout: true).trim()}"
-        IMAGE_NAME="${REGISTRY}/${REG_OWNER}/${REG_APP}"
-        TAG1="$BRANCH_NAME"
-        TAG2="$COMMIT_HASH"
-        TAG3="$VERSION"
-        TAG4="latest"
+        IMAGE_NAME="${REGISTRY}/${REG_OWNER}/${REPO_NAME}"
     }
     stages {
         stage('Build') {
             steps {
-                container(name: 'kaniko', shell: '/busybox/sh') {
-                    script {
-                        container(name: 'kaniko', shell: '/busybox/sh') {
-                            kaniko.build("./Dockerfile", ["$IMAGE_NAME:$TAG1", "$IMAGE_NAME:$TAG2", "$IMAGE_NAME:$TAG3"])
+                script {
+                    container(name: 'go', shell: '/bin/bash') {
+                        if (BRANCH_NAME.equals("master")) { 
+                            CCV = go.ccv()
                         }
                     }
-                }
-            }
-            post {
-                always {
-                    archiveArtifacts artifacts: 'image.tar', onlyIfSuccessful: true
-                }
-            }
-        }
-        stage('Test') {
-            steps {
-                sh '''
-                echo "Test stage"
-                '''
-            }
-        }
-        stage('Publish') {
-            steps {
-                script {
-                    container(name: 'crane', shell: '/busybox/sh') {
-                        def imageTagsPushAlways = ["$IMAGE_NAME:$TAG1", "$IMAGE_NAME:$TAG2"]
-                        def imageTagsPushForDevelopBranch = ["$IMAGE_NAME:$TAG3"]
-                        def imageTagsPushForMasterBranch = []
-                        image.publish(
-                            imageTagsPushAlways,
-                            imageTagsPushForDevelopBranch,
-                            imageTagsPushForMasterBranch
-                        )
+                    container(name: 'kaniko', shell: '/busybox/sh') {
+                        def tagsToPush = ["$IMAGE_NAME:$BRANCH_NAME", "$IMAGE_NAME:$COMMIT_HASH"]
+                        if (CCV != null && !CCV.trim().isEmpty() && BRANCH_NAME.equals("master")) {
+                            tagsToPush.add("$IMAGE_NAME:$CCV")
+                            tagsToPush.add("$IMAGE_NAME:latest")
+                        } else if (BRANCH_NAME.equals("develop")) {
+                            def now = new Date()
+                            def currTimestamp = now.format("yyyy-MM-dd'T'HH.mm'Z'", TimeZone.getTimeZone('UTC'))
+                            tagsToPush.add("$IMAGE_NAME:$currTimestamp")
+                        }
+                        kaniko.buildAndPush("./Dockerfile", tagsToPush)
                     }
-                }
-            }
-            post {
-                cleanup {
-                    sh '''
-                    echo "Remove archived artifacts."
-                    '''
                 }
             }
         }
