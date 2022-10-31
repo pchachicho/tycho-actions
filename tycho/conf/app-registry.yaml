@@ -376,5 +376,5 @@ contexts:
         details: Has a console, syntax-highlighting editor that supports direct code execution, and tools for plotting, history, debugging and workspace management.
         docs: https://www.rstudio.com/
         services:
-          cloud-top: 8787
+          rstudio-server: 8787
         count: 1
