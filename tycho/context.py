@@ -278,7 +278,7 @@ class TychoContext:
         principal_params = {"username": principal.username, "access_token": principal.access_token, "refresh_token": principal.refresh_token, "host": host}
         principal_params_json = json.dumps(principal_params, indent=4)
         """ Security Context that are set for the app """
-        spec["services"][app_id]["securityContext"] = self.apps[app_id]["securityContext"] if 'securityContext' in self.apps[app_id].keys() else None
+        spec["security_context"] = self.apps[app_id]["securityContext"] if 'securityContext' in self.apps[app_id].keys() else {}
         spec["services"][app_id]["ext"] = self.apps[app_id]["ext"] if 'ext' in self.apps[app_id].keys() else None
         spec["services"][app_id].update(resource_request)
         """ Certain apps might require appending a string to the custom URL. """
