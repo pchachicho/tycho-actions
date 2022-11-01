@@ -98,6 +98,10 @@ contexts:
         ext:
           kube:
             readinessProbe: none
+      rstudio-server:
+        ext:
+          kube:
+            readinessProbe: none
   common: 
     name: HeLx Common App Registry
     mixin:
@@ -365,4 +369,13 @@ contexts:
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
           cloud-top: 8080
+        count: 1
+      rstudio-server:
+        name: RStudio Server
+        description: An integrated development environment for R.
+        details: Has a console, syntax-highlighting editor that supports direct code execution, and tools for plotting, history, debugging and workspace management.
+        docs: https://www.rstudio.com/
+        proxy-rewrite-rule: True
+        services:
+          rstudio-server: 8080
         count: 1
