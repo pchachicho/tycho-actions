@@ -339,13 +339,13 @@ contexts:
     mixin:
       - sys
     apps:
-      ohdsi:
-        name: OHDSI - Observational Health Data Sciences and Informatics
-        description: OHDSI program is a multi-stakeholder, interdisciplinary collaborative to bring out the value of health data through large-scale analytics
-        details: Includes Atlas, WebAPI, and Postgres.
+      atlas:
+        name: ATLAS
+        description: ATLAS is a free, publicly available, web-based tool developed by the OHDSI community that facilitates the design and execution of analyses on standardized, patient-level, observational data in the CDM format.
+        details: ATLAS is deployed as a web application in combination with the OHDSI WebAPI. 
         docs: https://ohdsi.org/software-tools/
         services:
-          ohdsi: "8081"
+          atlas: "8081"
         count: 1
       cloud-top:
         name: Cloud Top
