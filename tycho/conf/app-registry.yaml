@@ -94,7 +94,7 @@ contexts:
         ext:
           kube:
             readinessProbe: none
-      ohdsi:
+      atlas:
         ext:
           kube:
             readinessProbe: none
