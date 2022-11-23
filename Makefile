@@ -10,14 +10,21 @@ DOCKER_IMAGE = ${DOCKER_OWNER}/${DOCKER_APP}:$(DOCKER_TAG)
 
 .DEFAULT_GOAL = help
 
-.PHONY: help clean install test build image publish
+.PHONY: help init clean install test build image publish
 
 version:
 	${PYTHON} --version
 	echo ${VERSION}
+
 #help: List available tasks on this project
 help:
 	@grep -E '^#[a-zA-Z\.\-]+:.*$$' $(MAKEFILE_LIST) | tr -d '#' | awk 'BEGIN {FS = ": "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+
+#init: Initialize the repository with things like git commit hooks
+init:
+	git --version
+	@echo "Please make sure your git version is greater than 2.9.0. If it's not, this command will fail."
+	git config --local core.hooksPath .githooks/
 
 clean:
 	${PYTHON} -m pip uninstall -y tycho-api
