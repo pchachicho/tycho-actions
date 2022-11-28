@@ -272,6 +272,15 @@ class System:
         template = generator.render (template, context=final_context)
         logger.debug (f"--generated template: {template}")
         return template
+    
+    @staticmethod
+    def env_from_components(spec,env):
+        env_from_spec = (spec.get('env', []) or spec.get('environment', []))
+        env_from_registry = []
+        for k in env:
+            if "STDNFS_PVC" in env[k]: env_from_registry.append(f"{k}={os.environ.get('STDNFS_PVC')}")
+            else: env_from_registry.append(TemplateUtils.render_string(f"{k}={env[k]}",env))
+        return env_from_spec + env_from_registry
 
     @staticmethod
     def parse (config, name, principal, system, service_account, env={}, services={}):
@@ -314,7 +323,6 @@ class System:
             """ Entrypoint may be a string or an array. Deal with either case."""
             ports = []
             expose = []
-            env_all = []
             entrypoint = spec.get ('entrypoint', '')
             """ Adding default volumes to the system containers """
             if spec.get('volumes') == None:
@@ -357,9 +365,7 @@ class System:
                 'containerPort': e
               })
             """Parsing env variables"""
-            env_from_spec = (spec.get('env', []) or spec.get('environment', []))
-            env_from_registry = [f"{ev}={os.environ.get('STDNFS_PVC')}" if '$STDNFS' in env[ev] else f"{ev}={env[ev]}" for ev in env]
-            env_all = env_from_spec + env_from_registry
+            env_all = System.env_from_components(spec,env)
             if spec.get("ext",None) != None and spec.get("ext").get("kube",None) != None:
                 liveness_probe = spec["ext"]["kube"].get('livenessProbe',None)
                 readiness_probe = spec["ext"]["kube"].get('readinessProbe',None)

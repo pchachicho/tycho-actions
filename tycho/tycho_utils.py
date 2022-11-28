@@ -62,6 +62,12 @@ class TemplateUtils:
         return yaml.load_all (text, Loader=yaml.SafeLoader)
 
     @staticmethod
+    def render_string(s,context):
+        tmpl = Template(s)
+        tmpl.globals['now'] = datetime.datetime.utcnow
+        return tmpl.render(context)
+
+    @staticmethod
     def apply_environment (environment, text):
         """ Given an environment configuration consisting of lines of Bash style variable assignemnts,
         parse the variables and apply them to the given text."""

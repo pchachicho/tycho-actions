@@ -144,7 +144,7 @@ class KubernetesCompute(Compute):
                         for key, value in item.data.items():
                             value = str(base64.b64decode(value), 'utf-8')
                             for container in system.containers:
-                                container.env.append([key, value])
+                                container.env.append([key,TemplateUtils.render_string(value,container.env)])
                         break
             except ApiException as e:
                 logger.debug(f"App requires {system.system_name}-env configmap with envs: {e}")
