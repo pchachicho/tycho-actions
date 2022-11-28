@@ -11,8 +11,8 @@ tycho:
       # Configure application defaults.
       defaults:
         securityContext:
-          Uid: 1000
-          Gid: 1000
+          uid: 1000
+          gid: 1000
         services:
           init:
             resources:

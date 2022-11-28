@@ -10,6 +10,7 @@ import copy
 from deepmerge import Merger
 from requests_cache import CachedSession
 from string import Template
+from jinja2 import Template as jinja2Template
 from tycho.client import TychoClientFactory, TychoStatus, TychoSystem, TychoClient
 from tycho.exceptions import ContextException
 
@@ -157,10 +158,28 @@ class TychoContext:
                 response = self.http_session.get(url)
                 if response.status_code != 200:
                     raise ValueError(f"-- app {app_id}. failed to parse spec. code:{response.status_code}")
-                app_definition = yaml.safe_load(response.text)
-                self.apps[app_id]['definition'] = app_definition
+                template_dict = yaml.safe_load (response.text)
+                context = self.registry["settings"]
+                logger.debug (f"-----> context: {context}")
+                spec_template = str (template_dict)
+                logger.debug (f"-----> spec_template:\n{spec_template}")
+                template = jinja2Template (spec_template)
+                try:
+                    app_def_str = template.render(**context)
+                    logger.debug (f"-----> Rendered app definition:\n{app_def_str}")
+
+                    # Validate safety of rendered definition/convert back to dict before storing
+                    app_definition = yaml.safe_load(app_def_str)
+                    self.apps[app_id]['definition'] = app_definition
+                except Exception as e:
+                    logger.error (f"-- app {app_id} failed to render app definition.\nError: {e}")
+                    logger.debug ("", exc_info=True)
+                    logger.warning (f"-- Setting app {app_id} app definition to empty dict")
+                    app_definition = {}
+                    self.apps[app_id]['definition'] = app_definition
             except Exception as e:
                 logger.error (f"-- app {app_id}. failed to parse definition.\nstatus code:{response.status_code}\nerror: {e}")
+                logger.debug ("", exc_info=True)
         return app_definition
 
     def get_spec (self, app_id):
@@ -175,8 +194,22 @@ class TychoContext:
                 response = self.http_session.get (url)
                 if response.status_code != 200:
                     raise ValueError (f"-- app {app_id}. failed to parse spec. code:{response.status_code}")
-                spec = yaml.safe_load (response.text)
-                self.apps[app_id]['spec_obj'] = spec
+                template_dict = yaml.safe_load (response.text)
+                context = self.registry["settings"]
+                logger.debug (f"-----> context: {context}")
+                spec_template = str (template_dict)
+                logger.debug (f"-----> spec_template: {spec_template}")
+                template = jinja2Template (spec_template)
+                try:
+                    spec_str = template.render(**context)
+                    logger.debug (f"-----> rendered spec:\n{spec_str}")
+
+                    # Validate spec/convert spec to a dict before storing
+                    spec = yaml.safe_load (spec_str)
+                    self.apps[app_id]['spec_obj'] = spec
+                except Exception as e:
+                    traceback.print_exc ()
+                    logger.error (f"--  app {app_id}.\n Failed to render spec.\nError: {e}")
             except Exception as e:
                 traceback.print_exc ()
                 if response:
@@ -227,7 +260,7 @@ class TychoContext:
     def update(self, request):
         return self.client.patch(request)
     
-    def start (self, principal, app_id, resource_request):
+    def start (self, principal, app_id, resource_request, host):
         """ Get application metadata, docker-compose structure, settings, and compose API request. """
         spec = self.get_spec (app_id)
         settings = self.client.parse_env (self.get_settings (app_id))
@@ -242,10 +275,10 @@ class TychoContext:
         """ Use a pre-existing k8s service account """
         service_account = self.apps[app_id]['serviceAccount'] if 'serviceAccount' in self.apps[app_id].keys() else None
         """ Add entity's auth information """
-        principal_params = {"username": principal.username, "access_token": principal.access_token, "refresh_token": principal.refresh_token}
+        principal_params = {"username": principal.username, "access_token": principal.access_token, "refresh_token": principal.refresh_token, "host": host}
         principal_params_json = json.dumps(principal_params, indent=4)
         """ Security Context that are set for the app """
-        spec["services"][app_id]["securityContext"] = self.apps[app_id]["securityContext"] if 'securityContext' in self.apps[app_id].keys() else None
+        spec["security_context"] = self.apps[app_id]["securityContext"] if 'securityContext' in self.apps[app_id].keys() else {}
         spec["services"][app_id]["ext"] = self.apps[app_id]["ext"] if 'ext' in self.apps[app_id].keys() else None
         spec["services"][app_id].update(resource_request)
         """ Certain apps might require appending a string to the custom URL. """

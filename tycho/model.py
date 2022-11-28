@@ -3,7 +3,7 @@ import logging
 import ipaddress
 import json
 import os
-from typing import OrderedDict
+from typing import OrderedDict, Dict, Any
 import uuid
 import yaml
 import traceback
@@ -53,8 +53,8 @@ class Volumes:
                    volume_name = parts[1].split("/")[2:3][0]
                    pvc_name = volume_name if volume_name not in self.pvcs else None
                    self.pvcs.append(volume_name)
-                   path = parts[2] if len(parts) is 3 else None
-                   subpath = "/".join(parts[1].split("/")[3:]) if len(parts) is 3 else None
+                   path = parts[2] if len(parts) == 3 else None
+                   subpath = "/".join(parts[1].split("/")[3:]) if len(parts) == 3 else None
                    self.volume(container['name'], pvc_name, volume_name, path, subpath)
                else:
                    logger.debug(f"Volume definition should follow the pattern: pvc://<pvc_name>/<sub-path>:<container-path> or pvc://<sub-path>:<container-path>")
@@ -96,7 +96,6 @@ class Container:
                  expose=[],
                  depends_on=None,
                  volumes=None,
-                 securityContext=None,
                  liveness_probe=None,
                  readiness_probe=None):
         """ Construct a container.
@@ -146,7 +145,6 @@ class Container:
             self.readiness_probe = TcpProbe(**readiness_probe)
         elif readiness_probe != None:
             self.readiness_probe = Probe(**readiness_probe)
-        self.security_context = securityContext
 
     def __repr__(self):
         return f"name:{self.name} image:{self.image} id:{self.identity} limits:{self.limits}"
@@ -155,7 +153,7 @@ class Container:
 
 class System:
     """ Distributed system of interacting containerized software. """
-    def __init__(self, config, name, principal, service_account, conn_string, proxy_rewrite_rule, containers, identifier, services={}):
+    def __init__(self, config, name, principal, service_account, conn_string, proxy_rewrite_rule, containers, identifier, services={}, security_context={}):
         """ Construct a new abstract model of a system given a name and set of containers.
         
             Serves as context for the generation of compute cluster specific artifacts.
@@ -197,10 +195,11 @@ class System:
         self.system_env = dict(principal)
         """ System tags """
         self.username = principal.get("username")
+        self.host = principal.get("host")
         self.annotations = {}
         self.namespace = "default"
         self.serviceaccount = service_account
-        self.runasroot = os.environ.get("RUNASROOT", "true").lower()
+        self.enable_init_container = os.environ.get("TYCHO_APP_ENABLE_VOLUME_PERMISSIONS_INIT_CONTAINER", "true")
         self.conn_string = conn_string
         """PVC flags and other variables for default volumes"""
         self.create_home_dirs = os.environ.get("CREATE_HOME_DIRS", "false").lower()
@@ -209,14 +208,33 @@ class System:
         self.subpath_dir = os.environ.get('SUBPATH_DIR', self.username)
         self.shared_dir = os.environ.get('SHARED_DIR', 'shared')
         """Default UID and GID for the system"""
-        security_context = self.config.get('tycho')['compute']['system']['defaults']['securityContext']
-        self.Uid = security_context.get('Uid', '1000')
-        self.Gid = security_context.get('Gid', '1000')
+        default_security_context = self.config.get('tycho')['compute']['system']['defaults']['securityContext']
+        self.default_run_as_user = default_security_context.get('uid', '1000')
+        self.default_run_as_group = default_security_context.get('gid', '1000')
+        """Override container security context"""
+        self.security_context = security_context
         """Resources and limits for the init container"""
-        self.init_cpus = os.environ.get("INIT_CPUS", "250m")
-        self.init_memory = os.environ.get("INIT_MEMORY", "250Mi")
+        self.init_cpus = os.environ.get("TYCHO_APP_INIT_CPUS", "250m")
+        self.init_memory = os.environ.get("TYCHO_APP_INIT_MEMORY", "250Mi")
         """Proxy rewrite rule for ambassador service annotations"""
         self.proxy_rewrite_rule = proxy_rewrite_rule
+
+    @staticmethod
+    def set_security_context(sc_from_registry):
+        security_context: dict[str, Any] = {}
+        if os.environ.get("TYCHO_APP_RUN_AS_USER"):
+            security_context["run_as_user"] = os.environ.get("TYCHO_APP_RUN_AS_USER")
+        else:
+            security_context["run_as_user"] = sc_from_registry.get("runAsUser")
+        if os.environ.get("TYCHO_APP_RUN_AS_GROUP"):
+            security_context["run_as_group"] = os.environ.get("TYCHO_APP_RUN_AS_GROUP")
+        else:
+            security_context["run_as_group"] = sc_from_registry.get("runAsGroup")
+        if os.environ.get("TYCHO_APP_FS_GROUP"):
+            security_context["fs_group"] = os.environ.get("TYCHO_APP_FS_GROUP")
+        else:
+            security_context["fs_group"] = sc_from_registry.get("fsGroup")
+        return security_context
 
     def _get_ambassador_id(self):
         return os.environ.get("AMBASSADOR_ID", "")
@@ -254,6 +272,15 @@ class System:
         template = generator.render (template, context=final_context)
         logger.debug (f"--generated template: {template}")
         return template
+    
+    @staticmethod
+    def env_from_components(spec,env):
+        env_from_spec = (spec.get('env', []) or spec.get('environment', []))
+        env_from_registry = []
+        for k in env:
+            if "STDNFS_PVC" in env[k]: env_from_registry.append(f"{k}={os.environ.get('STDNFS_PVC')}")
+            else: env_from_registry.append(TemplateUtils.render_string(f"{k}={env[k]}",env))
+        return env_from_spec + env_from_registry
 
     @staticmethod
     def parse (config, name, principal, system, service_account, env={}, services={}):
@@ -266,6 +293,7 @@ class System:
             :param env: Dictionary of settings.
             :param services: Service specifications - networking configuration.
         """
+        security_context = System.set_security_context(system.get("security_context", {}))
         principal = json.loads(principal)
         identifier = System.get_identifier()
         containers = []
@@ -295,7 +323,6 @@ class System:
             """ Entrypoint may be a string or an array. Deal with either case."""
             ports = []
             expose = []
-            env_all = []
             entrypoint = spec.get ('entrypoint', '')
             """ Adding default volumes to the system containers """
             if spec.get('volumes') == None:
@@ -338,9 +365,7 @@ class System:
                 'containerPort': e
               })
             """Parsing env variables"""
-            env_from_spec = (spec.get('env', []) or spec.get('environment', []))
-            env_from_registry = [f"{ev}={os.environ.get('STDNFS_PVC')}" if '$STDNFS' in env[ev] else f"{ev}={env[ev]}" for ev in env]
-            env_all = env_from_spec + env_from_registry
+            env_all = System.env_from_components(spec,env)
             if spec.get("ext",None) != None and spec.get("ext").get("kube",None) != None:
                 liveness_probe = spec["ext"]["kube"].get('livenessProbe',None)
                 readiness_probe = spec["ext"]["kube"].get('readinessProbe',None)
@@ -360,7 +385,6 @@ class System:
                 "expose": expose,
                 "depends_on": spec.get("depends_on", []),
                 "volumes": [v for v in spec.get("volumes", [])],
-                "securityContext":  spec.get("securityContext", {}),
                 "liveness_probe": liveness_probe,
                 "readiness_probe": readiness_probe
             })
@@ -373,7 +397,8 @@ class System:
             "proxy_rewrite_rule": spec.get("proxy_rewrite_rule", False),
             "containers": containers,
             "identifier": identifier,
-            "services": services
+            "services": services,
+            "security_context": security_context
         }
         logger.debug (f"parsed-system: {json.dumps(system_specification, indent=2)}")
         system = System(**system_specification)

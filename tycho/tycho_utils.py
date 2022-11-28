@@ -59,7 +59,13 @@ class TemplateUtils:
         template.globals['now'] = datetime.datetime.utcnow
         text = template.render (**context)
         logger.debug (text)
-        return yaml.load_all (text)
+        return yaml.load_all (text, Loader=yaml.SafeLoader)
+
+    @staticmethod
+    def render_string(s,context):
+        tmpl = Template(s)
+        tmpl.globals['now'] = datetime.datetime.utcnow
+        return tmpl.render(context)
 
     @staticmethod
     def apply_environment (environment, text):
@@ -117,7 +123,8 @@ class Resource:
             result = yaml.safe_load (stream.read ())
         return result
     
-    def get_resource_obj (resource_name, format=None):
+    def get_resource_obj (self, resource_name, format=None):
+        # TODO: Fix bug where format could be different than resource's file extension in file name
         result = None
         if not format:
             if resource_name.endswith ('.yaml'):

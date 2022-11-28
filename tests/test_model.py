@@ -44,7 +44,7 @@ def test_system_parser(request):
     base_dir = os.path.dirname(os.path.dirname(__file__))
     spec_path = os.path.join(base_dir, "tycho", "sample", "jupyter-ds", "docker-compose.yaml")
     with open(spec_path, "r") as stream:
-        structure = yaml.load(stream)
+        structure = yaml.load(stream, Loader=yaml.FullLoader)
         system = System.parse(
             config=Config(),
             name="jupyter-ds",
