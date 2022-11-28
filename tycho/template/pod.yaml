@@ -59,8 +59,13 @@ spec:
         cpu: {{ system.init_cpus }}
     command: [ 'sh', '-c' ]
     args:
+      # chown doesn't seem to work all the time?  owner:group can end up being 65534:65534 sometimes.
       - mkdir -p {{ system.parent_dir }}/{{ system.subpath_dir }} &&
+        chown {{ system.security_context.run_as_user }}:{{ system.security_context.run_as_group }} {{ system.parent_dir }}/{{ system.subpath_dir }} &&
+        chmod 777 {{ system.parent_dir }}/{{ system.subpath_dir }} &&
         mkdir -p {{ system.parent_dir }}/{{ system.shared_dir }} &&
+        chmod 777 {{ system.parent_dir }}/{{ system.shared_dir }} &&
+        ls -aln {{ system.parent_dir }} &&
         echo OK
     volumeMounts:
     - name: {{ system.stdnfs_pvc }}
