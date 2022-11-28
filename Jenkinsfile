@@ -15,7 +15,7 @@ spec:
   - name: jnlp
     workingDir: /home/jenkins/agent
   - name: go
-    workingDir: /home/jenkins/agent
+    workingDir: /home/jenkins/go
     image: golang:1.19.1
     imagePullPolicy: Always
     resources:
