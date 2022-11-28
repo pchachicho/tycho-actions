@@ -60,7 +60,10 @@ spec:
     command: [ 'sh', '-c' ]
     args:
       - mkdir -p {{ system.parent_dir }}/{{ system.subpath_dir }} &&
+        chmod 777 {{ system.parent_dir }}/{{ system.subpath_dir }} &&
         mkdir -p {{ system.parent_dir }}/{{ system.shared_dir }} &&
+        chmod 777 {{ system.parent_dir }}/{{ system.shared_dir }} &&
+        ls -aln {{ system.parent_dir }} &&
         echo OK
     volumeMounts:
     - name: {{ system.stdnfs_pvc }}
