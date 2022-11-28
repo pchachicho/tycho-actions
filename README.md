@@ -29,6 +29,10 @@ This work relies on these foundations:
 This software is supported and released along SemVer semantics where new features are
 tagged vX.Y.Z (major, minor, patch) and the corresponding package is pushed to PYPI
 
+### Version starting with 1.7.0 origin
+
+SemVer releases start with 1.7.0
+
 ## Development environment
 1. git clone https://github.com/helxplatform/tycho.git --branch branch_name
 2. python3 -m venv /path/to/venv - could be any path
