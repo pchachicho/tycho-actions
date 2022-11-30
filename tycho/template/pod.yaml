@@ -185,7 +185,6 @@ spec:
       {% endif %}
 {% endif %}
     volumeMounts:
-    # This needs to be removed after
     {% if system.irods_enabled == True %}
     - name: irods-permissions
       mountPath: /permissions
