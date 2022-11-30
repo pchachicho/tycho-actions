@@ -64,7 +64,7 @@ spec:
       chown -R {{ system.Uid }}:{{ system.Gid }} {{ system.parent_dir }}/{{ system.subpath_dir }} &&
       chmod 775 {{ system.parent_dir }}/{{ system.shared_dir }} &&
       chown -R {{ system.Uid }}:{{ system.Gid }} {{ system.parent_dir }}/{{ system.shared_dir }} &&
-      echo OK
+      echo OK 
     {% endif %}
     volumeMounts:
     - name: {{ system.stdnfs_pvc }}
@@ -73,6 +73,20 @@ spec:
     - name: {{ system.stdnfs_pvc }}
       mountPath: {{ system.parent_dir }}/{{ system.shared_dir }}
       subPath: {{ system.shared_dir }}
+  {% if system.irods_enabled == True %}
+  - name: nfsrods-prep
+    image: busybox:1.28
+    # Fixed resources
+    command: ['sh', '-c'] 
+    args:
+    - touch /permissions/irodsvalidusers &&
+      echo {{system.nfsrods_uid}} >> /permissions/irodsvalidusers
+    volumeMounts:
+    - name: irods-permissions
+      mountPath: /permissions
+      subPath: permissions
+  {% endif %}
+
 {% endif %}
 {% endfor %}
   containers:
@@ -162,6 +176,12 @@ spec:
       {% endif %}
 {% endif %}
     volumeMounts:
+    # This needs to be removed after
+    {% if system.irods_enabled == True %}
+    - name: irods-permissions
+      mountPath: /permissions
+      readOnly: false
+    {% endif %}
 {% if container.volumes %}
 {% for volume in system.volumes %}
   {% if container.name == volume['container_name'] %}
@@ -241,15 +261,27 @@ spec:
 {% endfor %}
 
   volumes:
+  {% if system.irods_enabled == True %}
+  - name: irods-permissions
+    ephemeral:
+      volumeClaimTemplate:
+        spec:
+          accessModes: [ "ReadWriteMany" ]
+          # This storage class is how Kubernetes knows to give you an NVMe volume instead of a normal NFS volume
+          storageClassName: nvme-ephemeral
+          resources:
+            requests:
+              storage: 1Gi
+  {% endif %}
 # Changes
 {% for container in system.containers %}
 {% if container.volumes %}
-{% for volume in system.volumes %}
+{% for volume in system.volumes %} 
   {% if container.name == volume['container_name']%}
   {% if volume["pvc_name"] != None %}
-    - name: {{ volume["volume_name"] }}
-      persistentVolumeClaim:
-        claimName: {{ volume["pvc_name"] }}
+  - name: {{ volume["volume_name"] }}
+    persistentVolumeClaim:
+      claimName: {{ volume["pvc_name"] }}
   {% endif %}
   {% endif %}
   {% endfor %}
