@@ -93,7 +93,15 @@ contexts:
       octave:
         ext:
           kube:
-            readinessProbe: none              
+            readinessProbe: none
+      atlas:
+        ext:
+          kube:
+            readinessProbe: none
+      rstudio-server:
+        ext:
+          kube:
+            readinessProbe: none
   common: 
     name: HeLx Common App Registry
     mixin:
@@ -169,20 +177,12 @@ contexts:
         services:
           scout : 8080
         count: 1            
-  catalyst:
+  bdc:
     extends:
       - common
       - blackbalsam
     name: BioData Catalyst App Registry
     apps:
-      dicom-gh:
-        name: DICOM Viewer - Google Health
-        description: OHIF is a framework for building medical imaging web applications.
-        details: Uses the OrthaNC DICOM service for indexing image data.
-        docs: https://ohif.org/
-        services:
-          dicom-gh : 8080
-        count: 1
       hail:
         name: Hail / Jupyter Workspace
         description: A notebook computing interface to a large single node Hail genomics workspace.
@@ -249,13 +249,6 @@ contexts:
           blackbalsam : 8888
         proxy-rewrite-rule: True
         count: -1
-      #rshiny:
-      #  name: R Shiny
-      #  description: Shiny is an R package that makes it easy to build interactive web apps straight from R.
-      #  details: You can host standalone apps on a webpage or embed them in R Markdown documents or build dashboards.
-      #  docs: https://shiny.rstudio.com/
-      #  services:
-      #    rshiny : 3838
   restartr:
     extends:
       - common
@@ -340,4 +333,34 @@ contexts:
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
           cloud-top: 8080
+        count: 1
+  tracs:
+    name: TraCS
+    mixin:
+      - sys
+    apps:
+      atlas:
+        name: ATLAS
+        description: ATLAS is a free, publicly available, web-based tool developed by the OHDSI community that facilitates the design and execution of analyses on standardized, patient-level, observational data in the CDM format.
+        details: ATLAS is deployed as a web application in combination with the OHDSI WebAPI. 
+        docs: https://ohdsi.org/software-tools/
+        services:
+          atlas: "8081"
+        count: 1
+      cloud-top:
+        name: Cloud Top
+        description: CloudTop is a cloud native, browser accessible Linux desktop.
+        details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
+        docs: https://helxplatform.github.io/cloudtop-docs/
+        services:
+          cloud-top: 8080
+        count: 1
+      rstudio-server:
+        name: RStudio Server
+        description: An integrated development environment for R.
+        details: Has a console, syntax-highlighting editor that supports direct code execution, and tools for plotting, history, debugging and workspace management.
+        docs: https://www.rstudio.com/
+        proxy-rewrite-rule: True
+        services:
+          rstudio-server: 8080
         count: 1

@@ -1,0 +1,6 @@
+[run]
+include =
+    tycho/**
+
+omit =
+    tycho/__init__.py

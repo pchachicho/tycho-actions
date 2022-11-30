@@ -51,7 +51,7 @@ def __test_context ():
     failed = []
     successful_total = 0
     failed_total = 0
-    for product in [ "braini", "catalyst", "scidas", "blackbalsam" ]:
+    for product in [ "braini", "bdc", "scidas", "blackbalsam" ]:
         tc = TychoContext (product=product)
         successful_count = 0
         failed_count = 0
