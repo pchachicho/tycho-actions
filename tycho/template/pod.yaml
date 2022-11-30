@@ -59,12 +59,7 @@ spec:
         cpu: {{ system.init_cpus }}
     command: [ 'sh', '-c' ]
     args:
-    - chmod 775 {{ system.parent_dir }}/{{ system.subpath_dir }} &&
-      chown -R {{ system.Uid }}:{{ system.Gid }} {{ system.parent_dir }}/{{ system.subpath_dir }} &&
-      chmod 775 {{ system.parent_dir }}/{{ system.shared_dir }} &&
-      chown -R {{ system.Uid }}:{{ system.Gid }} {{ system.parent_dir }}/{{ system.shared_dir }} &&
-      echo OK 
-    - mkdir -p {{ system.parent_dir }}/{{ system.subpath_dir }} &&
+      - mkdir -p {{ system.parent_dir }}/{{ system.subpath_dir }} &&
         chmod 777 {{ system.parent_dir }}/{{ system.subpath_dir }} &&
         mkdir -p {{ system.parent_dir }}/{{ system.shared_dir }} &&
         chmod 777 {{ system.parent_dir }}/{{ system.shared_dir }} &&
@@ -73,14 +68,6 @@ spec:
     volumeMounts:
     - name: {{ system.stdnfs_pvc }}
       mountPath: {{ system.parent_dir }}
-    {% endif %}
-    volumeMounts:
-    - name: {{ system.stdnfs_pvc }}
-      mountPath: {{ system.parent_dir }}/{{ system.subpath_dir }}
-      subPath: {{system.username}}
-    - name: {{ system.stdnfs_pvc }}
-      mountPath: {{ system.parent_dir }}/{{ system.shared_dir }}
-      subPath: {{ system.shared_dir }}
   {% if system.irods_enabled == True %}
   - name: nfsrods-prep
     image: busybox:1.28
@@ -89,6 +76,8 @@ spec:
     args:
     - touch /permissions/irodsvalidusers &&
       echo {{system.nfsrods_uid}} >> /permissions/irodsvalidusers
+    securityContext:
+      runAsUser: 0
     volumeMounts:
     - name: irods-permissions
       mountPath: /permissions
@@ -284,7 +273,7 @@ spec:
 # Changes
 {% for container in system.containers %}
 {% if container.volumes %}
-{% for volume in system.volumes %} 
+{% for volume in system.volumes %}
   {% if container.name == volume['container_name']%}
   {% if volume["pvc_name"] != None %}
   - name: {{ volume["volume_name"] }}
