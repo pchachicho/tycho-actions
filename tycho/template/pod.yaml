@@ -74,7 +74,7 @@ spec:
     # Fixed resources
     command: ['sh', '-c'] 
     args:
-    - echo {{system.nfsrods_uid}} >> /permissions/irodsvalidusers
+    - echo {{system.nfsrods_uid}} > /permissions/irodsvalidusers
     securityContext:
       runAsUser: 0
     volumeMounts:
