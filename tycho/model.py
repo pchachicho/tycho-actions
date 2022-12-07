@@ -169,6 +169,8 @@ class System:
         self.identifier = identifier
         self.system_name = name
         self.amb = False
+        self.irods_enabled = False
+        self.nfrods_uid = ''
         self.dev_phase = os.getenv('DEV_PHASE', "prod")
         self.name = f"{name}-{self.identifier}"
         assert self.name is not None, "System name is required."
@@ -218,6 +220,13 @@ class System:
         self.init_memory = os.environ.get("TYCHO_APP_INIT_MEMORY", "250Mi")
         """Proxy rewrite rule for ambassador service annotations"""
         self.proxy_rewrite_rule = proxy_rewrite_rule
+        """Flag for checking if an IRODS connection is enabled"""
+        if os.environ.get("IROD_ZONE") != None:
+            logger.info("Irods zone enabled")
+            self.irods_enabled = True
+            self.nfsrods_uid = os.environ.get(self.username+"_NFSRODS_UID",' ')
+        else:
+            logger.info("Irods zone not enabled")
 
     @staticmethod
     def set_security_context(sc_from_registry):
