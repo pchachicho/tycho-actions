@@ -198,7 +198,7 @@ contexts:
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
-          cloud-top : 8080
+          cloud-top : 3000
         count: 1
   scidas:
     extends:
