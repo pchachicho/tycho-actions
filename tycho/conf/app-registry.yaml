@@ -74,6 +74,13 @@ contexts:
               cmd: ["pgrep", "jupyter" ]
               delay: 5
               period: 5
+      jupyter-datascience-db:
+        ext:
+          kube:
+            livenessProbe:
+              cmd: ["pgrep", "jupyter" ]
+              delay: 5
+              period: 5
       cloud-top:
         ext:
           kube:
@@ -102,7 +109,7 @@ contexts:
         ext:
           kube:
             readinessProbe: none
-  common: 
+  common:
     name: HeLx Common App Registry
     mixin:
       - sys
@@ -128,7 +135,7 @@ contexts:
         name: Octave
         description: A scientific programming language largely compatible with MATLAB.
         details: GNU Octave is a high-level language, primarily intended for numerical computations.
-        docs: https://www.gnu.org/software/octave 
+        docs: https://www.gnu.org/software/octave
         services:
           octave : 8080
         count: 1
@@ -147,7 +154,7 @@ contexts:
       imagej:
         name: ImageJ Viewer
         description: Imagej is an image processor developed at NIH/LOCI.
-        details: can display, edit, analyze, process, save and print 8-bit, 16-bit and 32-bit images. It can read many image formats.
+        details: Can display, edit, analyze, process, save and print 8-bit, 16-bit and 32-bit images. It can read many image formats.
         docs: https://imagej.nih.gov/ij/
         services:
           imagej: 8080
@@ -377,13 +384,13 @@ contexts:
         services:
           atlas: "8081"
         count: 1
-      pgadmin-cloud-top:
-        name: Cloud Top
-        description: CloudTop is a cloud native, browser accessible Linux desktop.
+      pgadmin-cloudtop:
+        name: PGAdmin CloudTop
+        description: PGAdmin-CloudTop is a cloud native, browser accessible Linux desktop with database libraries added.
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
-          cloud-top: 8080
+          cloud-top: "8080"
         count: 1
       rstudio-server:
         name: RStudio Server
@@ -392,11 +399,11 @@ contexts:
         docs: https://www.rstudio.com/
         proxy-rewrite-rule: True
         services:
-          rstudio-server: 8080
+          rstudio-server: "8080"
         count: 1
-      jupyter-education:
-        name: Jupyter Data Science for Education
-        description: Jupyter DataScience - A Jupyter notebook for exploring and visualizing data.
+      jupyter-datascience-db:
+        name: Jupyter Data Science with PGAdmin
+        description: Jupyter DataScience - A Jupyter notebook for exploring and visualizing data with SqlAlchemy support.
         details: Includes R, Julia, and Python.
         docs: https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook
         services:
