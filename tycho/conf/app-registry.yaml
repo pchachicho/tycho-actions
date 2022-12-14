@@ -363,6 +363,28 @@ contexts:
         services:
           rstudio-server: 8080
         count: 1
+  eduhelx-sandbox:
+    name: UNC Helx for Education Sandbox
+    mixin:
+      - sys
+    apps:
+      jupyter-education:
+        name: Jupyter Data Science for Education
+        description: Jupyter DataScience - A Jupyter notebook for exploring and visualizing data.
+        details: Includes R, Julia, and Python.
+        docs: https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook
+        services:
+          jupyter-education: "8888"
+        proxy-rewrite-rule: True
+      rstudio-server:
+        name: RStudio Server
+        description: An integrated development environment for R.
+        details: Has a console, syntax-highlighting editor that supports direct code execution, and tools for plotting, history, debugging and workspace management.
+        docs: https://www.rstudio.com/
+        proxy-rewrite-rule: True
+        services:
+          rstudio-server: "8080"
+        count: 1
   chip690:
     name: CHIP690
     mixin:
