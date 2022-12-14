@@ -231,18 +231,18 @@ class System:
     @staticmethod
     def set_security_context(sc_from_registry):
         security_context: dict[str, Any] = {}
-        if os.environ.get("TYCHO_APP_RUN_AS_USER"):
+        if "runAsUser" in sc_from_registry.keys():
+            security_context["run_as_user"] = str(sc_from_registry.get("runAsUser"))
+        else:
             security_context["run_as_user"] = os.environ.get("TYCHO_APP_RUN_AS_USER")
+        if "runAsGroup" in sc_from_registry.keys():
+            security_context["run_as_group"] = str(sc_from_registry.get("runAsGroup"))
         else:
-            security_context["run_as_user"] = sc_from_registry.get("runAsUser")
-        if os.environ.get("TYCHO_APP_RUN_AS_GROUP"):
             security_context["run_as_group"] = os.environ.get("TYCHO_APP_RUN_AS_GROUP")
+        if "fsGroup" in sc_from_registry.keys():
+            security_context["fs_group"] = str(sc_from_registry.get("fsGroup"))
         else:
-            security_context["run_as_group"] = sc_from_registry.get("runAsGroup")
-        if os.environ.get("TYCHO_APP_FS_GROUP"):
             security_context["fs_group"] = os.environ.get("TYCHO_APP_FS_GROUP")
-        else:
-            security_context["fs_group"] = sc_from_registry.get("fsGroup")
         return security_context
 
     def _get_ambassador_id(self):

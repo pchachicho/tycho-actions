@@ -189,6 +189,11 @@ contexts:
       - common
       - blackbalsam
     name: BioData Catalyst App Registry
+    cloud-top:
+      securityContext:
+        fsGroup: 0
+        runAsUser: 0
+        runAsGroup: 0    
     apps:
       hail:
         name: Hail / Jupyter Workspace
@@ -312,6 +317,11 @@ contexts:
     name: UNC Helx for Education
     mixin:
       - sys
+    cloud-top:
+      securityContext:
+        fsGroup: 0
+        runAsUser: 0
+        runAsGroup: 0
     apps:
       jupyter-education:
         name: Jupyter Data Science for Education
