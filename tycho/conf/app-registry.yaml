@@ -150,6 +150,11 @@ contexts:
     blackbalsam:
       securityContext:
         fsGroup: 0
+    cloud-top:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 1136
     apps:
       imagej:
         name: ImageJ Viewer
@@ -174,7 +179,7 @@ contexts:
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
-          cloud-top : 8080
+          cloud-top : 3000
         count: 1
       scout:
         name: SCOUT
@@ -191,9 +196,9 @@ contexts:
     name: BioData Catalyst App Registry
     cloud-top:
       securityContext:
-        fsGroup: 1136
         runAsUser: 0
-        runAsGroup: 0    
+        runAsGroup: 0
+        fsGroup: 1136
     apps:
       hail:
         name: Hail / Jupyter Workspace
@@ -210,13 +215,18 @@ contexts:
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
-          cloud-top : 8080
+          cloud-top : 3000
         count: 1
   scidas:
     extends:
       - common
       - blackbalsam
     name: SciDAS App Registry
+    cloud-top:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 1136
     apps:
       nextflow:
         name: Nextflow API
@@ -244,7 +254,7 @@ contexts:
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
-          cloud-top : 8080
+          cloud-top : 3000
         count: 1
   blackbalsam:
     extends:
@@ -296,6 +306,11 @@ contexts:
     extends:
       - common
     name: Argus Array
+    cloud-top:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 1136
     apps:
       kstars:
         name: KStars And DS9
@@ -311,10 +326,15 @@ contexts:
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
-          cloud-top: 8080
+          cloud-top: 3000
         count: 1
   eduhelx:
     name: UNC Helx for Education
+    cloud-top:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 1136
     mixin:
       - sys
     cloud-top:
@@ -349,7 +369,7 @@ contexts:
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
-          cloud-top: 8080
+          cloud-top: 3000
         count: 1
   tracs:
     name: TraCS
@@ -372,6 +392,28 @@ contexts:
         proxy-rewrite-rule: True
         services:
           rstudio-server: 8080
+        count: 1
+  eduhelx-sandbox:
+    name: UNC Helx for Education Sandbox
+    mixin:
+      - sys
+    apps:
+      jupyter-education:
+        name: Jupyter Data Science for Education
+        description: Jupyter DataScience - A Jupyter notebook for exploring and visualizing data.
+        details: Includes R, Julia, and Python.
+        docs: https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook
+        services:
+          jupyter-education: "8888"
+        proxy-rewrite-rule: True
+      rstudio-server:
+        name: RStudio Server
+        description: An integrated development environment for R.
+        details: Has a console, syntax-highlighting editor that supports direct code execution, and tools for plotting, history, debugging and workspace management.
+        docs: https://www.rstudio.com/
+        proxy-rewrite-rule: True
+        services:
+          rstudio-server: "8080"
         count: 1
   chip690:
     name: CHIP690
