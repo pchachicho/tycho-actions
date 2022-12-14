@@ -153,7 +153,7 @@ class Container:
 
 class System:
     """ Distributed system of interacting containerized software. """
-    def __init__(self, config, name, principal, service_account, conn_string, proxy_rewrite_rule, containers, identifier, services={}, security_context={}):
+    def __init__(self, config, name, principal, service_account, conn_string, proxy_rewrite_rule, containers, identifier, services={}, security_context={}, init_security_context={}):
         """ Construct a new abstract model of a system given a name and set of containers.
         
             Serves as context for the generation of compute cluster specific artifacts.
@@ -215,6 +215,8 @@ class System:
         self.default_run_as_group = default_security_context.get('gid', '1000')
         """Override container security context"""
         self.security_context = security_context
+        """init security context"""
+        self.init_security_context = init_security_context
         """Resources and limits for the init container"""
         self.init_cpus = os.environ.get("TYCHO_APP_INIT_CPUS", "250m")
         self.init_memory = os.environ.get("TYCHO_APP_INIT_MEMORY", "250Mi")
@@ -234,16 +236,25 @@ class System:
         if "runAsUser" in sc_from_registry.keys():
             security_context["run_as_user"] = str(sc_from_registry.get("runAsUser"))
         else:
-            security_context["run_as_user"] = os.environ.get("TYCHO_APP_RUN_AS_USER")
+            security_context["run_as_user"] = os.environ.get("TYCHO_APP_RUN_AS_USER", "0")
         if "runAsGroup" in sc_from_registry.keys():
             security_context["run_as_group"] = str(sc_from_registry.get("runAsGroup"))
         else:
-            security_context["run_as_group"] = os.environ.get("TYCHO_APP_RUN_AS_GROUP")
+            security_context["run_as_group"] = os.environ.get("TYCHO_APP_RUN_AS_GROUP", "0")
         if "fsGroup" in sc_from_registry.keys():
             security_context["fs_group"] = str(sc_from_registry.get("fsGroup"))
         else:
-            security_context["fs_group"] = os.environ.get("TYCHO_APP_FS_GROUP")
+            security_context["fs_group"] = os.environ.get("TYCHO_APP_FS_GROUP", "0")
         return security_context
+
+    @staticmethod
+    def set_init_security_context():
+        init_security_context = {}
+        if os.environ.get("INIT_SC_RUN_AS_USER"):
+            init_security_context["run_as_user"] = os.environ.get("INIT_SC_RUN_AS_USER", "0")
+        if os.environ.get("INIT_SC_RUN_AS_GROUP"):
+            init_security_context["run_as_group"] = os.environ.get("INIT_SC_RUN_AS_GROUP", "0")
+        return init_security_context
 
     def _get_ambassador_id(self):
         return os.environ.get("AMBASSADOR_ID", "")
@@ -303,6 +314,7 @@ class System:
             :param services: Service specifications - networking configuration.
         """
         security_context = System.set_security_context(system.get("security_context", {}))
+        init_security_context = System.set_init_security_context()
         principal = json.loads(principal)
         identifier = System.get_identifier()
         containers = []
@@ -407,7 +419,8 @@ class System:
             "containers": containers,
             "identifier": identifier,
             "services": services,
-            "security_context": security_context
+            "security_context": security_context,
+            "init_security_context": init_security_context
         }
         logger.debug (f"parsed-system: {json.dumps(system_specification, indent=2)}")
         system = System(**system_specification)

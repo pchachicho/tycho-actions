@@ -191,7 +191,7 @@ contexts:
     name: BioData Catalyst App Registry
     cloud-top:
       securityContext:
-        fsGroup: 0
+        fsGroup: 1136
         runAsUser: 0
         runAsGroup: 0    
     apps:
@@ -319,7 +319,7 @@ contexts:
       - sys
     cloud-top:
       securityContext:
-        fsGroup: 0
+        fsGroup: 1136
         runAsUser: 0
         runAsGroup: 0
     apps:
