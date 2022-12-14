@@ -143,6 +143,11 @@ contexts:
     blackbalsam:
       securityContext:
         fsGroup: 0
+    cloud-top:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 1136
     apps:
       imagej:
         name: ImageJ Viewer
@@ -167,7 +172,7 @@ contexts:
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
-          cloud-top : 8080
+          cloud-top : 3000
         count: 1
       scout:
         name: SCOUT
@@ -182,6 +187,11 @@ contexts:
       - common
       - blackbalsam
     name: BioData Catalyst App Registry
+    cloud-top:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 1136
     apps:
       hail:
         name: Hail / Jupyter Workspace
@@ -205,6 +215,11 @@ contexts:
       - common
       - blackbalsam
     name: SciDAS App Registry
+    cloud-top:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 1136
     apps:
       nextflow:
         name: Nextflow API
@@ -232,7 +247,7 @@ contexts:
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
-          cloud-top : 8080
+          cloud-top : 3000
         count: 1
   blackbalsam:
     extends:
@@ -284,6 +299,11 @@ contexts:
     extends:
       - common
     name: Argus Array
+    cloud-top:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 1136
     apps:
       kstars:
         name: KStars And DS9
@@ -299,10 +319,15 @@ contexts:
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
-          cloud-top: 8080
+          cloud-top: 3000
         count: 1
   eduhelx:
     name: UNC Helx for Education
+    cloud-top:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 1136
     mixin:
       - sys
     apps:
@@ -332,7 +357,7 @@ contexts:
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
-          cloud-top: 8080
+          cloud-top: 3000
         count: 1
   tracs:
     name: TraCS
