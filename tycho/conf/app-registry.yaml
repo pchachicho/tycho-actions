@@ -154,7 +154,7 @@ contexts:
       securityContext:
         runAsUser: 0
         runAsGroup: 0
-        fsGroup: 1136
+        fsGroup: 0
     apps:
       imagej:
         name: ImageJ Viewer
@@ -198,7 +198,7 @@ contexts:
       securityContext:
         runAsUser: 0
         runAsGroup: 0
-        fsGroup: 1136
+        fsGroup: 0
     apps:
       hail:
         name: Hail / Jupyter Workspace
@@ -226,7 +226,7 @@ contexts:
       securityContext:
         runAsUser: 0
         runAsGroup: 0
-        fsGroup: 1136
+        fsGroup: 0
     apps:
       nextflow:
         name: Nextflow API
@@ -310,7 +310,7 @@ contexts:
       securityContext:
         runAsUser: 0
         runAsGroup: 0
-        fsGroup: 1136
+        fsGroup: 0
     apps:
       kstars:
         name: KStars And DS9
@@ -330,13 +330,13 @@ contexts:
         count: 1
   eduhelx:
     name: UNC Helx for Education
-    cloud-top:
-      securityContext:
-        runAsUser: 0
-        runAsGroup: 0
-        fsGroup: 1136
     mixin:
       - sys
+    cloud-top:
+      securityContext:
+        fsGroup: 0
+        runAsUser: 0
+        runAsGroup: 0
     apps:
       jupyter-education:
         name: Jupyter Data Science for Education
@@ -392,6 +392,11 @@ contexts:
     name: UNC Helx for Education Sandbox
     mixin:
       - sys
+    rstudio-server:
+      securityContext:
+        fsGroup: 0
+        runAsUser: 0
+        runAsGroup: 0
     apps:
       jupyter-education:
         name: Jupyter Data Science for Education
@@ -401,6 +406,7 @@ contexts:
         services:
           jupyter-education: "8888"
         proxy-rewrite-rule: True
+        count: 1
       rstudio-server:
         name: RStudio Server
         description: An integrated development environment for R.
