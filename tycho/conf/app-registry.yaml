@@ -154,7 +154,7 @@ contexts:
       securityContext:
         runAsUser: 0
         runAsGroup: 0
-        fsGroup: 1136
+        fsGroup: 0
     apps:
       imagej:
         name: ImageJ Viewer
@@ -198,9 +198,7 @@ contexts:
       securityContext:
         runAsUser: 0
         runAsGroup: 0
-        fsGroup: 1136
-        initRunAsUser: 30000
-        initRunAsGroup: 1136
+        fsGroup: 0
     apps:
       hail:
         name: Hail / Jupyter Workspace
@@ -228,7 +226,7 @@ contexts:
       securityContext:
         runAsUser: 0
         runAsGroup: 0
-        fsGroup: 1136
+        fsGroup: 0
     apps:
       nextflow:
         name: Nextflow API
@@ -312,7 +310,7 @@ contexts:
       securityContext:
         runAsUser: 0
         runAsGroup: 0
-        fsGroup: 1136
+        fsGroup: 0
     apps:
       kstars:
         name: KStars And DS9
@@ -336,11 +334,9 @@ contexts:
       - sys
     cloud-top:
       securityContext:
-        fsGroup: 1136
+        fsGroup: 0
         runAsUser: 0
         runAsGroup: 0
-        initRunAsUser: 30000
-        initRunAsGroup: 1136
     apps:
       jupyter-education:
         name: Jupyter Data Science for Education
