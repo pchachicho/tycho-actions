@@ -392,6 +392,11 @@ contexts:
     name: UNC Helx for Education Sandbox
     mixin:
       - sys
+    rstudio-server:
+      securityContext:
+        fsGroup: 0
+        runAsUser: 0
+        runAsGroup: 0
     apps:
       jupyter-education:
         name: Jupyter Data Science for Education
@@ -401,6 +406,7 @@ contexts:
         services:
           jupyter-education: "8888"
         proxy-rewrite-rule: True
+        count: 1
       rstudio-server:
         name: RStudio Server
         description: An integrated development environment for R.
