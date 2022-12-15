@@ -248,11 +248,15 @@ class System:
         return security_context
 
     @staticmethod
-    def set_init_security_context():
+    def set_init_security_context(sc_from_registry):
         init_security_context = {}
-        if os.environ.get("INIT_SC_RUN_AS_USER"):
+        if "initRunAsUser" in sc_from_registry.keys():
+            init_security_context["run_as_user"] = str(sc_from_registry.get("initRunAsUser"))
+        else:
             init_security_context["run_as_user"] = os.environ.get("INIT_SC_RUN_AS_USER", "0")
-        if os.environ.get("INIT_SC_RUN_AS_GROUP"):
+        if "initRunAsGroup" in sc_from_registry.keys():
+            init_security_context["run_as_group"] = str(sc_from_registry.get("initRunAsGroup"))
+        else:
             init_security_context["run_as_group"] = os.environ.get("INIT_SC_RUN_AS_GROUP", "0")
         return init_security_context
 
@@ -314,7 +318,7 @@ class System:
             :param services: Service specifications - networking configuration.
         """
         security_context = System.set_security_context(system.get("security_context", {}))
-        init_security_context = System.set_init_security_context()
+        init_security_context = System.set_init_security_context(system.get("security_context", {}))
         principal = json.loads(principal)
         identifier = System.get_identifier()
         containers = []

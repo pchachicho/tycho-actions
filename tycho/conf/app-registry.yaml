@@ -199,6 +199,8 @@ contexts:
         runAsUser: 0
         runAsGroup: 0
         fsGroup: 1136
+        initRunAsUser: 30000
+        initRunAsGroup: 1136
     apps:
       hail:
         name: Hail / Jupyter Workspace
@@ -330,11 +332,6 @@ contexts:
         count: 1
   eduhelx:
     name: UNC Helx for Education
-    cloud-top:
-      securityContext:
-        runAsUser: 0
-        runAsGroup: 0
-        fsGroup: 1136
     mixin:
       - sys
     cloud-top:
@@ -342,6 +339,8 @@ contexts:
         fsGroup: 1136
         runAsUser: 0
         runAsGroup: 0
+        initRunAsUser: 30000
+        initRunAsGroup: 1136
     apps:
       jupyter-education:
         name: Jupyter Data Science for Education
