@@ -150,11 +150,6 @@ contexts:
     blackbalsam:
       securityContext:
         fsGroup: 0
-    cloud-top:
-      securityContext:
-        runAsUser: 0
-        runAsGroup: 0
-        fsGroup: 0
     apps:
       imagej:
         name: ImageJ Viewer
@@ -179,7 +174,7 @@ contexts:
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
-          cloud-top : 3000
+          cloud-top : 8080
         count: 1
       scout:
         name: SCOUT
@@ -194,11 +189,6 @@ contexts:
       - common
       - blackbalsam
     name: BioData Catalyst App Registry
-    cloud-top:
-      securityContext:
-        runAsUser: 0
-        runAsGroup: 0
-        fsGroup: 0
     apps:
       hail:
         name: Hail / Jupyter Workspace
@@ -215,18 +205,13 @@ contexts:
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
-          cloud-top : 3000
+          cloud-top : 8080
         count: 1
   scidas:
     extends:
       - common
       - blackbalsam
     name: SciDAS App Registry
-    cloud-top:
-      securityContext:
-        runAsUser: 0
-        runAsGroup: 0
-        fsGroup: 0
     apps:
       nextflow:
         name: Nextflow API
@@ -254,7 +239,7 @@ contexts:
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
-          cloud-top : 3000
+          cloud-top : 8080
         count: 1
   blackbalsam:
     extends:
@@ -306,11 +291,6 @@ contexts:
     extends:
       - common
     name: Argus Array
-    cloud-top:
-      securityContext:
-        runAsUser: 0
-        runAsGroup: 0
-        fsGroup: 0
     apps:
       kstars:
         name: KStars And DS9
@@ -326,17 +306,12 @@ contexts:
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
-          cloud-top: 3000
+          cloud-top: 8080
         count: 1
   eduhelx:
     name: UNC Helx for Education
     mixin:
       - sys
-    cloud-top:
-      securityContext:
-        fsGroup: 0
-        runAsUser: 0
-        runAsGroup: 0
     apps:
       jupyter-education:
         name: Jupyter Data Science for Education
@@ -364,7 +339,7 @@ contexts:
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://helxplatform.github.io/cloudtop-docs/
         services:
-          cloud-top: 3000
+          cloud-top: 8080
         count: 1
   tracs:
     name: TraCS
@@ -390,6 +365,11 @@ contexts:
         count: 1
   eduhelx-sandbox:
     name: UNC Helx for Education Sandbox
+    webtop:
+      securityContext:
+        fsGroup: 0
+        runAsUser: 0
+        runAsGroup: 0
     mixin:
       - sys
     apps:
@@ -410,8 +390,21 @@ contexts:
         services:
           rstudio-server: "8080"
         count: 1
+      webtop:
+        name: Webtop
+        description: Webtop is a cloud native, browser accessible Linux desktop.
+        details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
+        docs: https://github.com/linuxserver/docker-webtop
+        services:
+          webtop: "3000"
+        count: 1
   chip690:
     name: CHIP690
+    webtop-pgadmin:
+      securityContext:
+        fsGroup: 0
+        runAsUser: 0
+        runAsGroup: 0
     mixin:
       - sys
     apps:
@@ -423,13 +416,13 @@ contexts:
         services:
           atlas: "8081"
         count: 1
-      pgadmin-cloudtop:
-        name: PGAdmin CloudTop
-        description: PGAdmin-CloudTop is a cloud native, browser accessible Linux desktop with database libraries added.
+      webtop-pgadmin:
+        name: Webtop pgAdmin
+        description: Webtop pgAdmin is a cloud native, browser accessible Linux desktop with database libraries added.
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
-        docs: https://helxplatform.github.io/cloudtop-docs/
+        docs: https://github.com/linuxserver/docker-webtop
         services:
-          cloud-top: "8080"
+          webtop-pgadmin: "3000"
         count: 1
       rstudio-server:
         name: RStudio Server
