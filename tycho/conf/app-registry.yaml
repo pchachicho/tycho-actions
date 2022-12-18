@@ -381,6 +381,11 @@ contexts:
         fsGroup: 0
         runAsUser: 0
         runAsGroup: 0
+    rstudio-server:
+      securityContext:
+        fsGroup: 0
+        runAsUser: 0
+        runAsGroup: 0
     mixin:
       - sys
     apps:
@@ -390,7 +395,7 @@ contexts:
         details: Includes R, Julia, and Python.
         docs: https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook
         services:
-          jupyter-education: 8888
+          jupyter-education: "8888"
         proxy-rewrite-rule: True
         count: 1
       rstudio-server:
@@ -400,7 +405,7 @@ contexts:
         docs: https://www.rstudio.com/
         proxy-rewrite-rule: True
         services:
-          rstudio-server: 8080
+          rstudio-server: "8080"
         count: 1
       webtop:
         name: Webtop
@@ -408,7 +413,7 @@ contexts:
         details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
         docs: https://github.com/linuxserver/docker-webtop
         services:
-          webtop: 3000
+          webtop: "3000"
         count: 1
   eduhelx-chip690:
     name: UNC Helx for Education CHIP690
