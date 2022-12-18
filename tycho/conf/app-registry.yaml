@@ -74,9 +74,6 @@ contexts:
               cmd: ["pgrep", "jupyter" ]
               delay: 5
               period: 5
-        # ext:
-        #   kube:
-        #     readinessProbe: none
       jupyter-datascience-db:
         ext:
           kube:
