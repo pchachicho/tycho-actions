@@ -364,7 +364,6 @@ contexts:
         services:
           rstudio-server: 8080
         count: 1
-<<<<<<< HEAD
   eduhelx-sandbox:
     name: UNC Helx for Education Sandbox
     webtop:
@@ -466,5 +465,3 @@ contexts:
         services:
           filebrowser: "8888"
         count: 1
-=======
->>>>>>> master
