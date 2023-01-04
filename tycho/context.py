@@ -14,6 +14,8 @@ from jinja2 import Template as jinja2Template
 from tycho.client import TychoClientFactory, TychoStatus, TychoSystem, TychoClient
 from tycho.exceptions import ContextException
 
+from urllib.parse import urljoin
+
 logger = logging.getLogger (__name__)
 
 mixin_merge = Merger(
@@ -41,29 +43,48 @@ class TychoContext:
     """
     
     """ https://github.com/heliumdatacommons/CommonsShare_AppStore/blob/master/CS_AppsStore/cloudtop_imagej/deployment.py """
-    def __init__(self, registry_config="app-registry.yaml", app_defaults_config="app-defaults.yaml",product="common", stub=False):
-        self.registry = self._get_config(registry_config)
-        self.app_defaults = self._get_config(app_defaults_config)
-        logger.info("defaults = ")
-        logger.info(self.app_defaults)
+    def __init__(self, registry_config="app-registry.yaml", app_defaults_config="app-defaults.yaml", product="common", tycho_config_url="", stub=False):
+        logger.info (f"-- init:\n registry_config: {registry_config}\n app_defaults_config: {app_defaults_config}\n product: {product}\n tycho_config_url: {tycho_config_url}\n stub: {stub}")
+        self.http_session = CachedSession (cache_name='tycho-registry')
+        self.registry = self._get_config(registry_config, tycho_config_url)
+        self.app_defaults = self._get_config(app_defaults_config, tycho_config_url)
+        logger.debug("defaults = ")
+        logger.debug(self.app_defaults)
+        logger.debug("registry = ")
+        logger.debug(self.registry)
         """ Uncomment this and related lines when this code goes live,. 
         Use a timeout on the API so the unit tests are not slowed down. """
         if not os.environ.get ('DEV_PHASE') == 'stub':
             self.client=TychoClient(url=os.environ.get('TYCHO_URL', "http://localhost:5000"))
         self.product = product
         self.apps = self._grok ()
-        self.http_session = CachedSession (cache_name='tycho-registry')
 
-    def _get_config(self, file_name):
+    def _get_config(self, file_name, tycho_config_url):
         """ Load the registry metadata. """
+        logger.info (f"-- loading config:\n file_name: {file_name}\ntycho_config_url: {tycho_config_url}")
         config = {}
-        """ Load it from the Tycho conf directory for now. Perhaps more dynamic in the future. """
-        config_path = os.path.join (
-            os.path.dirname (__file__),
-            "conf",
-            file_name)
-        with open(config_path, 'r') as stream:
-            config = yaml.safe_load (stream)
+        if tycho_config_url == "":
+            """ Load it from the Tycho conf directory for now. Perhaps more dynamic in the future. """
+            config_path = os.path.join (
+                os.path.dirname (__file__),
+                "conf",
+                file_name)
+            with open(config_path, 'r') as stream:
+                config = yaml.safe_load (stream)
+        else:
+            try:
+                # Make sure tycho_config_url ends with "/" or suffix is removed.
+                tycho_config_url += "/" if not tycho_config_url.endswith("/") else ""
+                app_registry_url = urljoin(tycho_config_url, file_name)
+                logger.debug (f"-- downloading {app_registry_url}")
+                response = self.http_session.get(app_registry_url)
+                if response.status_code != 200:
+                    raise ValueError(f"-- failed to download: {response.status_code}")
+                else:
+                    config = yaml.safe_load (response.text)
+            except Exception as e:
+                logger.error (f"-- URL: {app_registry_url}\nerror: {e}")
+                logger.debug ("", exc_info=True)
         return config
 
     def add_conf_impl(self, apps, context):
@@ -369,10 +390,11 @@ class ContextFactory:
     """ Flexible method for connecting to a TychoContext.
     Also, provide the null context for easy dev testing in appstore. """
     @staticmethod
-    def get (product, context_type="null"):
+    def get (product, registry_config="app-registry.yaml", app_defaults_config="app-defaults.yaml", context_type="null", tycho_config_url=""):
+        logger.info (f"-- ContextFactory.get:\n registry_config: {registry_config}\n app_defaults_config: {app_defaults_config}\n product: {product}\n tycho_config_url: {tycho_config_url}\n context_type: {context_type}")
         return {
             "null" : NullContext(product=product),
-            "live" : TychoContext(product=product)
+            "live" : TychoContext(registry_config=registry_config, app_defaults_config=app_defaults_config, product=product, tycho_config_url=tycho_config_url, stub=False)
         }[context_type]
     
             
