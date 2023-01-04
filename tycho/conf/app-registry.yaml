@@ -322,6 +322,7 @@ contexts:
         services:
           jupyter-education: "8888"
         proxy-rewrite-rule: True
+        gitea-integration: True
         count: 1
       filebrowser:
         name: File Browser
