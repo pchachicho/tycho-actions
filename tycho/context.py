@@ -44,10 +44,14 @@ class TychoContext:
     
     """ https://github.com/heliumdatacommons/CommonsShare_AppStore/blob/master/CS_AppsStore/cloudtop_imagej/deployment.py """
     def __init__(self, registry_config="app-registry.yaml", app_defaults_config="app-defaults.yaml", product="common", tycho_config_url="", stub=False):
+        # Make sure tycho_config_url ends with "/" or suffix is removed by urljoin.
+        if tycho_config_url != "":
+            tycho_config_url += "/" if not tycho_config_url.endswith("/") else ""
+        self.tycho_config_url = tycho_config_url
         logger.info (f"-- init:\n registry_config: {registry_config}\n app_defaults_config: {app_defaults_config}\n product: {product}\n tycho_config_url: {tycho_config_url}\n stub: {stub}")
         self.http_session = CachedSession (cache_name='tycho-registry')
-        self.registry = self._get_config(registry_config, tycho_config_url)
-        self.app_defaults = self._get_config(app_defaults_config, tycho_config_url)
+        self.registry = self._get_config(registry_config)
+        self.app_defaults = self._get_config(app_defaults_config)
         logger.debug("defaults = ")
         logger.debug(self.app_defaults)
         logger.debug("registry = ")
@@ -59,11 +63,11 @@ class TychoContext:
         self.product = product
         self.apps = self._grok ()
 
-    def _get_config(self, file_name, tycho_config_url):
+    def _get_config(self, file_name):
         """ Load the registry metadata. """
-        logger.info (f"-- loading config:\n file_name: {file_name}\ntycho_config_url: {tycho_config_url}")
+        logger.info (f"-- loading config:\n file_name: {file_name}\ntycho_config_url: {self.tycho_config_url}")
         config = {}
-        if tycho_config_url == "":
+        if self.tycho_config_url == "":
             """ Load it from the Tycho conf directory for now. Perhaps more dynamic in the future. """
             config_path = os.path.join (
                 os.path.dirname (__file__),
@@ -73,9 +77,7 @@ class TychoContext:
                 config = yaml.safe_load (stream)
         else:
             try:
-                # Make sure tycho_config_url ends with "/" or suffix is removed.
-                tycho_config_url += "/" if not tycho_config_url.endswith("/") else ""
-                app_registry_url = urljoin(tycho_config_url, file_name)
+                app_registry_url = urljoin(self.tycho_config_url, file_name)
                 logger.debug (f"-- downloading {app_registry_url}")
                 response = self.http_session.get(app_registry_url)
                 if response.status_code != 200:
@@ -151,6 +153,12 @@ class TychoContext:
                 if len(repos) == 0:
                     raise ValueError ("No spec URL and no repositories specified.")
                 repo_url = repos[0][1]
+                if not repo_url.startswith("http"):
+                    # Assume it is a directory within the same repo as the app registry file.
+                    if self.tycho_config_url == "":
+                        logging.error("tycho_config_url is empty string")
+                        raise ValueError(f"-- tycho_config_url is empty string, can't load app registry file")
+                    repo_url = urljoin(self.tycho_config_url, repo_url)
                 dockstore_branch = os.environ.get("DOCKSTORE_APPS_BRANCH", "master")
                 if dockstore_branch != "master":
                     repo_url = repo_url.replace("master", dockstore_branch)
