@@ -48,14 +48,12 @@ class TychoContext:
         if tycho_config_url != "":
             tycho_config_url += "/" if not tycho_config_url.endswith("/") else ""
         self.tycho_config_url = tycho_config_url
-        logger.info (f"-- init:\n registry_config: {registry_config}\n app_defaults_config: {app_defaults_config}\n product: {product}\n tycho_config_url: {self.tycho_config_url}\n stub: {stub}")
+        logger.info (f"-- TychoContext.__init__: registry_config: {registry_config} | app_defaults_config: {app_defaults_config} | product: {product} | tycho_config_url: {self.tycho_config_url} | stub: {stub}")
         self.http_session = CachedSession (cache_name='tycho-registry')
         self.registry = self._get_config(registry_config)
         self.app_defaults = self._get_config(app_defaults_config)
-        logger.debug("defaults = ")
-        logger.debug(self.app_defaults)
-        logger.debug("registry = ")
-        logger.debug(self.registry)
+        self.log_dict(self.app_defaults, pre_dict_message="defaults = \n")
+        self.log_dict(self.registry, pre_dict_message="registry = \n")
         """ Uncomment this and related lines when this code goes live,. 
         Use a timeout on the API so the unit tests are not slowed down. """
         if not os.environ.get ('DEV_PHASE') == 'stub':
@@ -88,6 +86,10 @@ class TychoContext:
                 logger.error (f"-- URL: {app_registry_url}\nerror: {e}")
                 logger.debug ("", exc_info=True)
         return config
+
+    def log_dict(self, dict, pre_dict_message="", level=logging.DEBUG):
+        message = pre_dict_message + json.dumps(dict, sort_keys=True, indent=4)
+        logger.log(level, message)
 
     def add_conf_impl(self, apps, context):
         for key, value in context.items():
@@ -199,6 +201,7 @@ class TychoContext:
 
                     # Validate safety of rendered definition/convert back to dict before storing
                     app_definition = yaml.safe_load(app_def_str)
+                    self.log_dict(app_definition, pre_dict_message="app_definition = \n")
                     self.apps[app_id]['definition'] = app_definition
                 except Exception as e:
                     logger.error (f"-- app {app_id} failed to render app definition.\nError: {e}")
@@ -399,7 +402,7 @@ class ContextFactory:
     Also, provide the null context for easy dev testing in appstore. """
     @staticmethod
     def get (product, registry_config="app-registry.yaml", app_defaults_config="app-defaults.yaml", context_type="null", tycho_config_url=""):
-        logger.info (f"-- ContextFactory.get:\n registry_config: {registry_config}\n app_defaults_config: {app_defaults_config}\n product: {product}\n tycho_config_url: {tycho_config_url}\n context_type: {context_type}")
+        logger.info (f"-- ContextFactory.get: registry_config: {registry_config} | app_defaults_config: {app_defaults_config} | product: {product} | tycho_config_url: {tycho_config_url} | context_type: {context_type}")
         return {
             "null" : NullContext(product=product),
             "live" : TychoContext(registry_config=registry_config, app_defaults_config=app_defaults_config, product=product, tycho_config_url=tycho_config_url, stub=False)
