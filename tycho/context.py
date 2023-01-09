@@ -400,13 +400,29 @@ class NullContext (TychoContext):
 class ContextFactory:
     """ Flexible method for connecting to a TychoContext.
     Also, provide the null context for easy dev testing in appstore. """
-    @staticmethod
-    def get (product, registry_config="app-registry.yaml", app_defaults_config="app-defaults.yaml", context_type="null", tycho_config_url=""):
+    _state = {}
+    def __init__(self):
+        self.__dict__ = self._state
+        if hasattr(self, 'contexts'):
+            logger.debug("ContextFactory.__init__: contexts attribute exists")
+        else:
+            logger.debug("ContextFactory.__init__: creating contexts dictionary")
+            self.contexts = {}
+    def get (self, product, registry_config="app-registry.yaml", app_defaults_config="app-defaults.yaml", context_type="null", tycho_config_url=""):
         logger.info (f"-- ContextFactory.get: registry_config: {registry_config} | app_defaults_config: {app_defaults_config} | product: {product} | tycho_config_url: {tycho_config_url} | context_type: {context_type}")
-        return {
-            "null" : NullContext(product=product),
-            "live" : TychoContext(registry_config=registry_config, app_defaults_config=app_defaults_config, product=product, tycho_config_url=tycho_config_url, stub=False)
-        }[context_type]
+        if context_type in self.contexts:
+            logger.debug(f"ContextFactory.get: returning existing context for {context_type}")
+            returnContext = self.contexts[context_type]
+        else:
+            logger.debug(f"ContextFactory.get: creating context for {context_type}")
+            if context_type == "null":
+                self.contexts[context_type] = NullContext(product=product)
+                returnContext = self.contexts[context_type]
+            elif context_type == "live":
+                self.contexts[context_type] = TychoContext(registry_config=registry_config, app_defaults_config=app_defaults_config, product=product, tycho_config_url=tycho_config_url, stub=False)
+                returnContext = self.contexts[context_type]
+        return returnContext
+
     
             
         
