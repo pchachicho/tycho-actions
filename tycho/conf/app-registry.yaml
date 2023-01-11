@@ -415,8 +415,8 @@ contexts:
     webtop-pgadmin:
       securityContext:
         fsGroup: 0
-        runAsUser: 0
-        runAsGroup: 0
+        runAsUser: 30000
+        runAsGroup: 1136
     mixin:
       - sys
     apps:
