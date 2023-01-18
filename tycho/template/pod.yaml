@@ -68,21 +68,6 @@ spec:
     volumeMounts:
     - name: {{ system.stdnfs_pvc }}
       mountPath: {{ system.parent_dir }}
-  # {% if system.irods_enabled == True %}
-  # - name: nfsrods-prep
-  #   image: busybox:1.28
-  #   # Fixed resources
-  #   command: ['sh', '-c'] 
-  #   args:
-  #   - touch /permissions/irodsvalidusers &&
-  #     echo {{system.nfsrods_uid}} >> /permissions/irodsvalidusers
-  #   securityContext:
-  #     runAsUser: 0
-  #   volumeMounts:
-  #   - name: irods-permissions
-  #     mountPath: /permissions
-  #     subPath: permissions
-  # {% endif %}
 {% endif %}
 {% endfor %}
   containers:
@@ -174,11 +159,10 @@ spec:
       {% endif %}
 {% endif %}
     volumeMounts:
-    # {% if system.irods_enabled == True %}
-    # - name: irods-permissions
-    #   mountPath: /permissions
-    #   readOnly: false
-    # {% endif %}
+    {% if system.irods_enabled == True %}
+    - name: nfs
+      mountPath: "/home/nfs"
+    {% endif %}
 {% if container.volumes %}
 {% for volume in system.volumes %}
   {% if container.name == volume['container_name'] %}
@@ -256,20 +240,13 @@ spec:
     {% endif %}
 {% endif %}
 {% endfor %}
-
   volumes:
-  # {% if system.irods_enabled == True %}
-  # - name: irods-permissions
-  #   ephemeral:
-  #     volumeClaimTemplate:
-  #       spec:
-  #         accessModes: [ "ReadWriteMany" ]
-  #         # This storage class is how Kubernetes knows to give you an NVMe volume instead of a normal NFS volume
-  #         storageClassName: nvme-ephemeral
-  #         resources:
-  #           requests:
-  #             storage: 1Gi
-  # {% endif %}
+  {% if system.irods_enabled == True %}
+  - name: nfs
+    nfs:
+      server: 10.20.0.204
+      path: /
+  {% endif %}
 # Changes
 {% for container in system.containers %}
 {% if container.volumes %}
