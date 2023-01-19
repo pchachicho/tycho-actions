@@ -227,6 +227,7 @@ class System:
         if os.environ.get("IROD_ZONE") != None:
             logger.info("Irods zone enabled")
             self.irods_enabled = True
+            self.nfsrods_host = os.environ.get('NFSRODS_HOST', '')
         else:
             logger.info("Irods zone not enabled")
 
