@@ -53,7 +53,7 @@ repositories:
     description: Main repository for HeLx Apps and Tools
     url: https://github.com/helxplatform/helx-apps/raw/master/app-specs
 settings:
-  helx_registry: docker.io
+  helx_registry: containers.renci.org
   third_party_registry: docker.io
 contexts:
   # The common context provides a convenient base set of applications.
@@ -102,7 +102,15 @@ contexts:
         ext:
           kube:
             readinessProbe: none
-  common: 
+      webtop:
+        ext:
+          kube:
+            readinessProbe: none
+      webtop-pgadmin:
+        ext:
+          kube:
+            readinessProbe: none
+  common:
     name: HeLx Common App Registry
     mixin:
       - sys
@@ -347,14 +355,6 @@ contexts:
         services:
           atlas: "8081"
         count: 1
-      cloud-top:
-        name: Cloud Top
-        description: CloudTop is a cloud native, browser accessible Linux desktop.
-        details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
-        docs: https://helxplatform.github.io/cloudtop-docs/
-        services:
-          cloud-top: 8080
-        count: 1
       rstudio-server:
         name: RStudio Server
         description: An integrated development environment for R.
@@ -363,4 +363,105 @@ contexts:
         proxy-rewrite-rule: True
         services:
           rstudio-server: 8080
+        count: 1
+  eduhelx-sandbox:
+    name: UNC Helx for Education Sandbox
+    webtop:
+      securityContext:
+        fsGroup: 0
+        runAsUser: 0
+        runAsGroup: 0
+    rstudio-server:
+      securityContext:
+        fsGroup: 0
+        runAsUser: 0
+        runAsGroup: 0
+    mixin:
+      - sys
+    rstudio-server:
+      securityContext:
+        fsGroup: 0
+        runAsUser: 0
+        runAsGroup: 0
+    apps:
+      jupyter-education:
+        name: Jupyter Data Science for Education
+        description: Jupyter DataScience - A Jupyter notebook for exploring and visualizing data.
+        details: Includes R, Julia, and Python.
+        docs: https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook
+        services:
+          jupyter-education: "8888"
+        proxy-rewrite-rule: True
+        count: 1
+      rstudio-server:
+        name: RStudio Server
+        description: An integrated development environment for R.
+        details: Has a console, syntax-highlighting editor that supports direct code execution, and tools for plotting, history, debugging and workspace management.
+        docs: https://www.rstudio.com/
+        proxy-rewrite-rule: True
+        services:
+          rstudio-server: "8080"
+        count: 1
+      webtop:
+        name: Webtop
+        description: Webtop is a cloud native, browser accessible Linux desktop.
+        details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
+        docs: https://github.com/linuxserver/docker-webtop
+        services:
+          webtop: "3000"
+        count: 1
+  eduhelx-chip690:
+    name: UNC Helx for Education CHIP690
+    webtop-pgadmin:
+      securityContext:
+        fsGroup: 0
+        runAsUser: 0
+        runAsGroup: 0
+    mixin:
+      - sys
+    apps:
+      atlas:
+        name: ATLAS
+        description: ATLAS is a free, publicly available, web-based tool developed by the OHDSI community that facilitates the design and execution of analyses on standardized, patient-level, observational data in the CDM format.
+        details: ATLAS is deployed as a web application in combination with the OHDSI WebAPI.
+        docs: https://ohdsi.org/software-tools/
+        services:
+          atlas: "8081"
+        count: 1
+      webtop-pgadmin:
+        name: Webtop pgAdmin
+        description: Webtop pgAdmin is a cloud native, browser accessible Linux desktop with database libraries added.
+        details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
+        docs: https://github.com/linuxserver/docker-webtop
+        services:
+          webtop-pgadmin: "3000"
+        count: 1
+      rstudio-server:
+        name: RStudio Server
+        description: An integrated development environment for R.
+        details: Has a console, syntax-highlighting editor that supports direct code execution, and tools for plotting, history, debugging and workspace management.
+        docs: https://www.rstudio.com/
+        proxy-rewrite-rule: True
+        services:
+          rstudio-server: "8080"
+        count: 1
+      jupyter-datascience-db:
+        name: Jupyter Data Science with SQLAlchemy
+        description: Jupyter DataScience - A Jupyter notebook for exploring and visualizing data with SQLAlchemy support.
+        details: Includes R, Julia, and Python.
+        docs: https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook
+        services:
+          jupyter-datascience-db: "8888"
+        proxy-rewrite-rule: True
+        count: 1
+      filebrowser:
+        name: File Browser
+        description: File Browser - a utility for browsing files through a web interface
+        details: File Browser provides a web interface for browsing files in a cloud environment.
+        docs: https://filebrowser.org/
+        securityContext:
+          fsGroup: 1000
+          runAsUser: 1000
+        services:
+          filebrowser: "8888"
         count: 1

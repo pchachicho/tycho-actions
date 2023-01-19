@@ -43,12 +43,20 @@ spec:
     {% endif %}
     {% if system.security_context.fs_group %}
     fsGroup: {{ system.security_context.fs_group }}
-    {% endif %}
   {% endif %}
 {% if (system.enable_init_container == "true") and (system.create_home_dirs == "true") and (system.dev_phase != "test") %}
   initContainers:
   - name: volume-tasks
     image: busybox:1.28
+    {% if system.init_security_context.run_as_user or system.init_security_context.run_as_group %}
+    securityContext:
+      {% if system.init_security_context.run_as_user %}
+      runAsUser: {{ system.init_security_context.run_as_user }}
+      {% endif %}
+      {% if system.init_security_context.run_as_group %}
+      runAsGroup: {{ system.init_security_context.run_as_group }}
+      {% endif %}
+    {% endif %}
     # Fixed resources
     resources:
       requests:
@@ -60,9 +68,7 @@ spec:
     command: [ 'sh', '-c' ]
     args:
       - mkdir -p {{ system.parent_dir }}/{{ system.subpath_dir }} &&
-        chmod 777 {{ system.parent_dir }}/{{ system.subpath_dir }} &&
         mkdir -p {{ system.parent_dir }}/{{ system.shared_dir }} &&
-        chmod 777 {{ system.parent_dir }}/{{ system.shared_dir }} &&
         ls -aln {{ system.parent_dir }} &&
         echo OK
     volumeMounts:
@@ -74,6 +80,15 @@ spec:
 {% for container in system.containers %}    
   - name: {{ container.name }}
     image: {{ container.image }}
+    {% if system.security_context.run_as_user or system.security_context.run_as_group %}
+    securityContext:
+      {% if system.security_context.run_as_user %}
+      runAsUser: {{ system.security_context.run_as_user }}
+      {% endif %}
+      {% if system.security_context.run_as_group %}
+      runAsGroup: {{ system.security_context.run_as_group }}
+      {% endif %}
+    {% endif %}
 {% if container.command %}
     command: {{ container.command }}
 {% endif %}
