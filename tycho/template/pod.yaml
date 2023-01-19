@@ -43,6 +43,7 @@ spec:
     {% endif %}
     {% if system.security_context.fs_group %}
     fsGroup: {{ system.security_context.fs_group }}
+    {% endif %}
   {% endif %}
 {% if (system.enable_init_container == "true") and (system.create_home_dirs == "true") and (system.dev_phase != "test") %}
   initContainers:
