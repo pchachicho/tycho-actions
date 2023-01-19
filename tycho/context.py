@@ -161,9 +161,10 @@ class TychoContext:
                         logging.error("tycho_config_url is empty string")
                         raise ValueError(f"-- tycho_config_url is empty string, can't load app registry file")
                     repo_url = urljoin(self.tycho_config_url, repo_url)
-                # ToDo: Remove the next three lines if we deprecate DOCKSTORE_APPS_BRANCH.
+                # ToDo: Remove the next four lines if we deprecate DOCKSTORE_APPS_BRANCH.
                 dockstore_branch = os.environ.get("DOCKSTORE_APPS_BRANCH", "")
-                if dockstore_branch != "":
+                external_tycho_app_registry_enabled = os.environ.get("EXTERNAL_TYCHO_APP_REGISTRY_ENABLED", "")
+                if external_tycho_app_registry_enabled == "false" and dockstore_branch != "":
                     repo_url = repo_url.replace("master", dockstore_branch)
                 app['spec'] = f"{repo_url}/{name}/docker-compose.yaml"
             spec_url = app['spec']
