@@ -106,6 +106,10 @@ contexts:
         ext:
           kube:
             readinessProbe: none
+      webtop-octave:
+        ext:
+          kube:
+            readinessProbe: none
       webtop-pgadmin:
         ext:
           kube:
