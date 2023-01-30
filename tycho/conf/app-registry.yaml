@@ -110,6 +110,10 @@ contexts:
         ext:
           kube:
             readinessProbe: none
+      pgadmin:
+        ext:
+          kube:
+            readinessProbe: none
   common:
     name: HeLx Common App Registry
     mixin:
@@ -415,8 +419,18 @@ contexts:
     webtop-pgadmin:
       securityContext:
         fsGroup: 0
-        runAsUser: 30000
-        runAsGroup: 1136
+        runAsUser: 0
+        runAsGroup: 0
+    pgadmin:
+      securityContext:
+        fsGroup: 0
+        runAsUser: 0
+        runAsGroup: 0
+    rstudio-server:
+      securityContext:
+        fsGroup: 0
+        runAsUser: 0
+        runAsGroup: 0
     mixin:
       - sys
     apps:
