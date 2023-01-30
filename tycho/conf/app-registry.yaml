@@ -324,6 +324,16 @@ contexts:
         proxy-rewrite-rule: True
         gitea-integration: True
         count: 1
+      jupyter-lab:
+        name: Jupyter Lab
+        description: Jupyter Lab - A Jupyter Lab instance for exploring and visualizing data.
+        details: Includes Python.
+        docs: https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook
+        services:
+          jupyter-lab: "8888"
+        proxy-rewrite-rule: True
+        gitea-integration: True
+        count: 1
       filebrowser:
         name: File Browser
         description: File Browser - a utility for browsing files through a web interface
@@ -379,11 +389,6 @@ contexts:
         runAsGroup: 0
     mixin:
       - sys
-    rstudio-server:
-      securityContext:
-        fsGroup: 0
-        runAsUser: 0
-        runAsGroup: 0
     apps:
       jupyter-education:
         name: Jupyter Data Science for Education

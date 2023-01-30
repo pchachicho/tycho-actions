@@ -242,6 +242,7 @@ class System:
         self.gitea_integration = gitea_integration
         self.gitea_host = os.environ.get("GITEA_HOST", " ")
         self.gitea_user = os.environ.get("GITEA_USER", " ")
+        self.gitea_service_name = os.environ.get("GITEA_SERVICE_NAME", " ")
 
     @staticmethod
     def set_security_context(sc_from_registry):
