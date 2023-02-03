@@ -1,0 +1,22 @@
+name: Build-Project
+run-name: Build-Project
+on:
+  push:
+  pull_request:
+    branches: [ master, develop ]
+jobs:
+  build-packages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install Package Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade build
+          python -m pip install --upgrade twine
+      - name: Build Package
+        run: python -m build
