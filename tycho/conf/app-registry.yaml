@@ -314,16 +314,6 @@ contexts:
     mixin:
       - sys
     apps:
-      jupyter-education:
-        name: Jupyter Data Science for Education
-        description: Jupyter DataScience - A Jupyter notebook for exploring and visualizing data.
-        details: Includes R, Julia, and Python.
-        docs: https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook
-        services:
-          jupyter-education: "8888"
-        proxy-rewrite-rule: True
-        gitea-integration: True
-        count: 1
       jupyter-lab:
         name: Jupyter Lab
         description: Jupyter Lab - A Jupyter Lab instance for exploring and visualizing data.
@@ -331,6 +321,16 @@ contexts:
         docs: https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook
         services:
           jupyter-lab: "8888"
+        proxy-rewrite-rule: True
+        gitea-integration: True
+        count: 1
+      jupyter-education:
+        name: Jupyter Data Science for Education
+        description: Jupyter DataScience - A Jupyter notebook for exploring and visualizing data.
+        details: Includes R, Julia, and Python.
+        docs: https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook
+        services:
+          jupyter-education: "8888"
         proxy-rewrite-rule: True
         gitea-integration: True
         count: 1
