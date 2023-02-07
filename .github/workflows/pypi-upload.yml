@@ -9,6 +9,7 @@ on:
     tags:
       - v1.*
       - v2.*
+      - v3.*
 jobs:
   build-deploy-to-pypi:
     runs-on: ubuntu-latest

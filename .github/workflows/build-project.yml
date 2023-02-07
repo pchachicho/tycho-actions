@@ -1,9 +1,21 @@
 name: Build-Project
 run-name: Build-Project
 on:
+  # Any push with exception to the below listed
+  # as they will be built in pypi-upload task. 
   push:
+    branches-ignore:
+    - master
+    - develop
+    - main
+    tags-ignore:
+    - v1.*
+    - v2.*
+    - v3.*
+  # We still test to ensure the build is successful
+  # for a 'potential PR'. 
   pull_request:
-    branches: [ master, develop ]
+    branches: [ master, develop, main ]
 jobs:
   build-packages:
     runs-on: ubuntu-latest
