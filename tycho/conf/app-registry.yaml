@@ -420,11 +420,6 @@ contexts:
         count: 1
   eduhelx-chip690:
     name: UNC Helx for Education CHIP690
-    webtop-pgadmin:
-      securityContext:
-        fsGroup: 0
-        runAsUser: 0
-        runAsGroup: 0
     pgadmin:
       securityContext:
         fsGroup: 0
@@ -438,14 +433,6 @@ contexts:
     mixin:
       - sys
     apps:
-      webtop-pgadmin:
-        name: Webtop pgAdmin
-        description: Webtop pgAdmin is a cloud native, browser accessible Linux desktop with database libraries added.
-        details: A Ubuntu graphical desktop environment for experimenting with native applications in the cloud.
-        docs: https://github.com/linuxserver/docker-webtop
-        services:
-          webtop-pgadmin: "3000"
-        count: 1
       rstudio-server:
         name: RStudio Server
         description: An integrated development environment for R.
