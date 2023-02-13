@@ -291,6 +291,7 @@ spec:
   - name: {{ system.username_all_hyphens }}-id-gitea
     secret:
       secretName: {{ system.username_all_hyphens }}-id-gitea
+      defaultMode: 0600
   {% endif %}
 # Changes
 {% for container in system.containers %}
