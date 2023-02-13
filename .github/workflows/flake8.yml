@@ -1,0 +1,35 @@
+name: flake8
+
+on:
+  push:
+    branches:
+      - "feat/*"
+      - "test/*"
+      - "fix/*"
+      - "doc/*"
+    tags:
+      - v1.*
+      - v2.*
+      - v3.*
+  pull_request:
+    branches: [ master, develop, main ]
+
+jobs:
+  flak8e-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Lint with flake8
+      run: |
+        pip install flake8
+        flake8 --ignore=E,W --exit-zero . 
+      # We continue on error here until the code is clean
+      continue-on-error: true
