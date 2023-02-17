@@ -5,13 +5,11 @@ on:
   # as they will be built in pypi-upload task. 
   push:
     branches-ignore:
-    - master
-    - develop
-    - main
+      - master
+      - develop
+      - main
     tags-ignore:
-    - v1.*
-    - v2.*
-    - v3.*
+      - 'v[0-9]+.[0-9]+.*'
   # We still test to ensure the build is successful
   # for a 'potential PR'. 
   pull_request:
