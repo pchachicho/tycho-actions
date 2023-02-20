@@ -1,7 +1,9 @@
 name: upload-dev-pypi
 run-name: Package and Upload develop image to Pypi  
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - develop 
 jobs:
   build-dev-to-pypi:
     runs-on: ubuntu-latest
@@ -19,18 +21,18 @@ jobs:
 
         # Important, this does not change the current version of __init__.py in the 
         # Github repo itself, only updates within container for the specific run. 
-        # Each new manual run will trigger a new version. 
+        # Each new push will trigger a dev build on develop. 
 
       - name: Edit __init__.py version for develop release
         run: |
-          R_VERSION=$(grep VERSION tycho/__init__.py | awk '{ print $3 }')
+          R_VERSION=$(grep VERSION ./tycho/__init__.py | awk '{ print $3 }' | tr -d '"')
           date=$(date '+%F_%H-%M-%S')
-          DEV_VERSION="${R_VERSION}-dev-${date}
-          echo VERSION=$DEV_VERSION > tycho/__init__.py 
-          
-      # - name: Build Package
-      #   run: python -m build
-      # - name: Publish Package to PyPI
-      #   uses: pypa/gh-action-pypi-publish@release/v1
-      #   with:
-      #     password: ${{ secrets.PYPI_API_TOKEN }}
+          DEV_VERSION=${R_VERSION}-dev-${date}
+          echo VERSION=\"$DEV_VERSION\" > ./tycho/__init__.py
+
+      - name: Build Package
+        run: python -m build
+      - name: Publish Package to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
