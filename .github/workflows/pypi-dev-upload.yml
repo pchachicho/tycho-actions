@@ -18,7 +18,6 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install --upgrade build
           python -m pip install --upgrade twine
-          python -m pip install -r requirements.txt
 
         # Important, this does not change the current version of __init__.py in the 
         # Github repo itself, only updates within container for the specific run. 
