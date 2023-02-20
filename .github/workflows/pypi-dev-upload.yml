@@ -1,0 +1,36 @@
+name: upload-pypi
+run-name: Package and Upload to Pypi  
+on:
+  workflow_dispatch:
+jobs:
+  build-deploy-to-pypi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install Package Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade build
+          python -m pip install --upgrade twine
+
+        # Important, this does not change the current version of __init__.py in the 
+        # Github repo itself, only updates within container for the specific run. 
+        # Each new manual run will trigger a new version. 
+
+      - name: Edit __init__.py version for develop release
+        run: |
+          R_VERSION=$(grep VERSION tycho/__init__.py | awk '{ print $3 }')
+          date=$(date '+%F_%H-%M-%S')
+          DEV_VERSION="${R_VERSION}-dev-${date}
+          echo VERSION=$DEV_VERSION > tycho/__init__.py 
+          
+      # - name: Build Package
+      #   run: python -m build
+      # - name: Publish Package to PyPI
+      #   uses: pypa/gh-action-pypi-publish@release/v1
+      #   with:
+      #     password: ${{ secrets.PYPI_API_TOKEN }}
