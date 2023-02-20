@@ -33,7 +33,7 @@ tagged vX.Y.Z (major, minor, patch) and the corresponding package is pushed to P
 
 SemVer releases start with 1.7.0
 
-### Continuos Integration (CI) with Github Actions
+## Continuos Integration (CI) with Github Actions
 
 Tycho is packaged and published to pypi automatically by the github workflows on this project. To create a main/master pypi package for tycho, the `VERSION` in `tycho/__init__.py` will need to be updated. 
 
