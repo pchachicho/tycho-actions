@@ -2,18 +2,13 @@ name: flake8
 
 on:
   push:
-    branches:
-      - "feat/*"
-      - "test/*"
-      - "fix/*"
-      - "doc/*"
-    tags:
-      - 'v[0-9]+.[0-9]+.*'
+  # Run flake every time.
   pull_request:
     branches: [ master, develop, main ]
+    types: [ opened ]
 
 jobs:
-  flak8e-check:
+  flake8-check:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
