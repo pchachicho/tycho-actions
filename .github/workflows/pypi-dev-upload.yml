@@ -1,9 +1,9 @@
-name: upload-pypi
-run-name: Package and Upload to Pypi  
+name: upload-dev-pypi
+run-name: Package and Upload develop image to Pypi  
 on:
   workflow_dispatch:
 jobs:
-  build-deploy-to-pypi:
+  build-dev-to-pypi:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
