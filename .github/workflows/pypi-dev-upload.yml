@@ -26,7 +26,7 @@ jobs:
       - name: Edit __init__.py version for develop release
         run: |
           R_VERSION=$(grep VERSION ./tycho/__init__.py | awk '{ print $3 }' | tr -d '"')
-          date=$(date '+%F_%H-%M-%S')
+          date=$(date '+%F%H%M%S')
           DEV_VERSION=${R_VERSION}.dev${date}
           echo VERSION=\"$DEV_VERSION\" > ./tycho/__init__.py
 
