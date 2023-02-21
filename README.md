@@ -35,9 +35,13 @@ SemVer releases start with 1.7.0
 
 ## Continuos Integration (CI) with Github Actions
 
-Tycho is packaged and published to pypi automatically by the github workflows on this project. To create a main/master pypi package for tycho, the `VERSION` in `tycho/__init__.py` will need to be updated. 
+Tycho is packaged and published to pypi automatically by the github workflows on this project. To create a main/master pypi package for tycho, the `VERSION` in `tycho/__init__.py` will need to be updated by the developer to the desired stable release version number. 
 
-If testing in develop branch only, editing the `tycho/__init__.py` file will NOT be necessary, as the pypi-dev-upload.yml workflow will create a new tag based on day and time for your testing purposes that will be uploaded upon each push to develop branch. This means that a pr from feature branch to develop results in an automatic pypi build.
+If testing in the develop branch only, editing the `tycho/__init__.py` file will NOT be necessary to generate a pypi package build, as the pypi-dev-upload.yml workflow will create a new tag based on day and time for your testing purposes which is uploaded upon each push to the develop branch. This ".dev" tag does not affect the develop branch code at all. 
+
+This means that a pr from feature branch to develop branch results in an automatic pypi build. If on the same day, a change to the develop branch occurs, then a new build is also generated with a differing ".dev" tag similar to `tycho-api:1.12.0.dev20230221030806`. 
+
+To locate the ".dev" tagged pypi build, navigate to the corresponding workflow run in the `Github Actions` tab, called `build-dev-to-pypi` then click the dropdown for `Publish Package to Pypi` and the link to the package will be provided within. The .dev packages are not searchable in Pypi as this would distract from stable packages of the same name and cause confusion - see pep 440. 
 
 ## Development environment
 1. git clone https://github.com/helxplatform/tycho.git --branch branch_name
