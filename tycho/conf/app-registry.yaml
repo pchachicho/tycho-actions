@@ -383,11 +383,6 @@ contexts:
         runAsGroup: 0
     mixin:
       - sys
-    rstudio-server:
-      securityContext:
-        fsGroup: 0
-        runAsUser: 0
-        runAsGroup: 0
     apps:
       jupyter-education:
         name: Jupyter Data Science for Education
