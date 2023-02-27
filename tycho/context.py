@@ -14,6 +14,8 @@ from jinja2 import Template as jinja2Template
 from tycho.client import TychoClientFactory, TychoStatus, TychoSystem, TychoClient
 from tycho.exceptions import ContextException
 
+from urllib.parse import urljoin
+
 logger = logging.getLogger (__name__)
 
 mixin_merge = Merger(
@@ -41,30 +43,53 @@ class TychoContext:
     """
     
     """ https://github.com/heliumdatacommons/CommonsShare_AppStore/blob/master/CS_AppsStore/cloudtop_imagej/deployment.py """
-    def __init__(self, registry_config="app-registry.yaml", app_defaults_config="app-defaults.yaml",product="common", stub=False):
+    def __init__(self, registry_config="app-registry.yaml", app_defaults_config="app-defaults.yaml", product="common", tycho_config_url="", stub=False):
+        # Make sure tycho_config_url ends with "/" or suffix is removed by urljoin.
+        if tycho_config_url != "":
+            tycho_config_url += "/" if not tycho_config_url.endswith("/") else ""
+        self.tycho_config_url = tycho_config_url
+        logger.info (f"-- TychoContext.__init__: registry_config: {registry_config} | app_defaults_config: {app_defaults_config} | product: {product} | tycho_config_url: {self.tycho_config_url} | stub: {stub}")
+        self.http_session = CachedSession (cache_name='tycho-registry')
         self.registry = self._get_config(registry_config)
         self.app_defaults = self._get_config(app_defaults_config)
-        logger.info("defaults = ")
-        logger.info(self.app_defaults)
+        self.log_dict(self.app_defaults, pre_dict_message="defaults = \n")
+        self.log_dict(self.registry, pre_dict_message="registry = \n")
         """ Uncomment this and related lines when this code goes live,. 
         Use a timeout on the API so the unit tests are not slowed down. """
         if not os.environ.get ('DEV_PHASE') == 'stub':
             self.client=TychoClient(url=os.environ.get('TYCHO_URL', "http://localhost:5000"))
         self.product = product
         self.apps = self._grok ()
-        self.http_session = CachedSession (cache_name='tycho-registry')
 
     def _get_config(self, file_name):
         """ Load the registry metadata. """
+        logger.info (f"-- loading config:\n file_name: {file_name}\ntycho_config_url: {self.tycho_config_url}")
         config = {}
-        """ Load it from the Tycho conf directory for now. Perhaps more dynamic in the future. """
-        config_path = os.path.join (
-            os.path.dirname (__file__),
-            "conf",
-            file_name)
-        with open(config_path, 'r') as stream:
-            config = yaml.safe_load (stream)
+        if self.tycho_config_url == "":
+            """ Load it from the Tycho conf directory for now. Perhaps more dynamic in the future. """
+            config_path = os.path.join (
+                os.path.dirname (__file__),
+                "conf",
+                file_name)
+            with open(config_path, 'r') as stream:
+                config = yaml.safe_load (stream)
+        else:
+            try:
+                app_registry_url = urljoin(self.tycho_config_url, file_name)
+                logger.debug (f"-- downloading {app_registry_url}")
+                response = self.http_session.get(app_registry_url)
+                if response.status_code != 200:
+                    raise ValueError(f"-- failed to download: {response.status_code}")
+                else:
+                    config = yaml.safe_load (response.text)
+            except Exception as e:
+                logger.error (f"-- URL: {app_registry_url}\nerror: {e}")
+                logger.debug ("", exc_info=True)
         return config
+
+    def log_dict(self, dict, pre_dict_message="", level=logging.DEBUG):
+        message = pre_dict_message + json.dumps(dict, sort_keys=True, indent=4)
+        logger.log(level, message)
 
     def add_conf_impl(self, apps, context):
         for key, value in context.items():
@@ -130,8 +155,16 @@ class TychoContext:
                 if len(repos) == 0:
                     raise ValueError ("No spec URL and no repositories specified.")
                 repo_url = repos[0][1]
-                dockstore_branch = os.environ.get("DOCKSTORE_APPS_BRANCH", "master")
-                if dockstore_branch != "master":
+                if not repo_url.startswith("http"):
+                    # Assume it is a directory within the same repo as the app registry file.
+                    if self.tycho_config_url == "":
+                        logging.error("tycho_config_url is empty string")
+                        raise ValueError(f"-- tycho_config_url is empty string, can't load app registry file")
+                    repo_url = urljoin(self.tycho_config_url, repo_url)
+                # ToDo: Remove the next four lines if we deprecate DOCKSTORE_APPS_BRANCH.
+                dockstore_branch = os.environ.get("DOCKSTORE_APPS_BRANCH", "")
+                external_tycho_app_registry_enabled = os.environ.get("EXTERNAL_TYCHO_APP_REGISTRY_ENABLED", "")
+                if external_tycho_app_registry_enabled == "false" and dockstore_branch != "":
                     repo_url = repo_url.replace("master", dockstore_branch)
                 app['spec'] = f"{repo_url}/{name}/docker-compose.yaml"
             spec_url = app['spec']
@@ -170,6 +203,7 @@ class TychoContext:
 
                     # Validate safety of rendered definition/convert back to dict before storing
                     app_definition = yaml.safe_load(app_def_str)
+                    self.log_dict(app_definition, pre_dict_message="app_definition = \n")
                     self.apps[app_id]['definition'] = app_definition
                 except Exception as e:
                     logger.error (f"-- app {app_id} failed to render app definition.\nError: {e}")
@@ -371,12 +405,29 @@ class NullContext (TychoContext):
 class ContextFactory:
     """ Flexible method for connecting to a TychoContext.
     Also, provide the null context for easy dev testing in appstore. """
-    @staticmethod
-    def get (product, context_type="null"):
-        return {
-            "null" : NullContext(product=product),
-            "live" : TychoContext(product=product)
-        }[context_type]
+    _state = {}
+    def __init__(self):
+        self.__dict__ = self._state
+        if hasattr(self, 'contexts'):
+            logger.debug("ContextFactory.__init__: contexts attribute exists")
+        else:
+            logger.debug("ContextFactory.__init__: creating contexts dictionary")
+            self.contexts = {}
+    def get (self, product, registry_config="app-registry.yaml", app_defaults_config="app-defaults.yaml", context_type="null", tycho_config_url=""):
+        logger.info (f"-- ContextFactory.get: registry_config: {registry_config} | app_defaults_config: {app_defaults_config} | product: {product} | tycho_config_url: {tycho_config_url} | context_type: {context_type}")
+        if context_type in self.contexts:
+            logger.debug(f"ContextFactory.get: returning existing context for {context_type}")
+            returnContext = self.contexts[context_type]
+        else:
+            logger.debug(f"ContextFactory.get: creating context for {context_type}")
+            if context_type == "null":
+                self.contexts[context_type] = NullContext(product=product)
+                returnContext = self.contexts[context_type]
+            elif context_type == "live":
+                self.contexts[context_type] = TychoContext(registry_config=registry_config, app_defaults_config=app_defaults_config, product=product, tycho_config_url=tycho_config_url, stub=False)
+                returnContext = self.contexts[context_type]
+        return returnContext
+
     
             
         
