@@ -3,7 +3,6 @@
 
 [![Linter](https://github.com/helxplatform/tycho/actions/workflows/flake8.yml/badge.svg)](https://github.com/helxplatform/tycho/actions/workflows/flake8.yml)
 
-
 Tycho is an API, compiler, and executor for cloud native distributed systems.
 
 * A subset of [docker-compose](https://docs.docker.com/compose/) is the system specification syntax.
