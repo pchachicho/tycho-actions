@@ -3,7 +3,16 @@ run-name: Package and Upload develop image to Pypi
 on:
   push:
     branches:
-      - develop 
+      - develop
+    paths-ignore:
+      - README.md
+      - .old_cicd/*
+      - .github/*
+      - .github/workflows/*
+      - LICENSE
+      - .gitignore
+      - .dockerignore
+      - .githooks
 jobs:
   build-dev-to-pypi:
     runs-on: ubuntu-latest
