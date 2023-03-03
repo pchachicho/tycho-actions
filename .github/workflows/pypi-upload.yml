@@ -5,6 +5,15 @@ on:
     branches:
       - master
       - main
+    paths-ignore:
+      - README.md
+      - .old_cicd/*
+      - .github/*
+      - .github/workflows/*
+      - LICENSE
+      - .gitignore
+      - .dockerignore
+      - .githooks
     tags:
       - 'v[0-9]+.[0-9]+.*'
 jobs:
