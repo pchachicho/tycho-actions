@@ -3,7 +3,7 @@
 
 [![flake8](https://github.com/helxplatform/tycho/actions/workflows/flake8.yml/badge.svg)](https://github.com/helxplatform/tycho/actions/workflows/flake8.yml)
 
-[![PyPI](https://img.shields.io/pypi/v/tycho-api?label=tycho)](https://httpspypi.org/project/tycho-api/1.12.0/)
+[![PyPI](https://img.shields.io/pypi/v/tycho-api?label=tycho)](https://pypi.org/project/tycho-api/)
 
 Tycho is an API, compiler, and executor for cloud native distributed systems.
 
