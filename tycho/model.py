@@ -223,7 +223,10 @@ class System:
         self.default_run_as_user = default_security_context.get('uid', '1000')
         self.default_run_as_group = default_security_context.get('gid', '1000')
         """Override container security context"""
-        self.security_context = security_context
+        if os.environ.get("NFSRODS_UID"):
+            self.security_context = { "run_as_user": os.environ.get("NFSRODS_UID")}
+        else:
+            self.security_context = security_context
         """init security context"""
         self.init_security_context = init_security_context
         """Resources and limits for the init container"""
@@ -231,11 +234,11 @@ class System:
         self.init_memory = os.environ.get("TYCHO_APP_INIT_MEMORY", "250Mi")
         """Proxy rewrite rule for ambassador service annotations"""
         self.proxy_rewrite_rule = proxy_rewrite_rule
-        """Flag for checking if an IRODS connection is enabled"""
+        # """Flag for checking if an IRODS connection is enabled"""
         if os.environ.get("IROD_ZONE") != None:
             logger.info("Irods zone enabled")
             self.irods_enabled = True
-            self.nfsrods_uid = os.environ.get(self.username+"_NFSRODS_UID",' ')
+            self.nfsrods_host = os.environ.get('NFSRODS_HOST', '')
         else:
             logger.info("Irods zone not enabled")
         """gitea settings"""
@@ -247,6 +250,12 @@ class System:
     @staticmethod
     def set_security_context(sc_from_registry):
         security_context: dict[str, Any] = {}
+        if os.environ.get("NFSRODS_UID"):
+            security_context["run_as_user"] = os.environ.get("NFSRODS_UID")
+        else:
+            security_context["run_as_user"] = sc_from_registry.get("runAsUser")
+        if os.environ.get("TYCHO_APP_RUN_AS_USER"):
+            security_context["run_as_user"] = os.environ.get("TYCHO_APP_RUN_AS_USER")
         if "runAsUser" in sc_from_registry.keys():
             security_context["run_as_user"] = str(sc_from_registry.get("runAsUser"))
         else:
