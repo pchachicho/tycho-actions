@@ -235,12 +235,12 @@ class System:
         """Proxy rewrite rule for ambassador service annotations"""
         self.proxy_rewrite_rule = proxy_rewrite_rule
         # """Flag for checking if an IRODS connection is enabled"""
-        if os.environ.get("IROD_ZONE") != None:
-            logger.info("Irods zone enabled")
+        if os.environ.get("IROD_HOST") != None:
+            logger.info("Irods host enabled")
             self.irods_enabled = True
             self.nfsrods_host = os.environ.get('NFSRODS_HOST', '')
         else:
-            logger.info("Irods zone not enabled")
+            logger.info("Irods host not enabled")
         """gitea settings"""
         self.gitea_integration = gitea_integration
         self.gitea_host = os.environ.get("GITEA_HOST", " ")
