@@ -3,11 +3,16 @@ import logging
 import ipaddress
 import json
 import os
+import string
 from typing import OrderedDict, Dict, Any
 import uuid
 import yaml
 import traceback
 from tycho.tycho_utils import TemplateUtils
+
+from cryptography.hazmat.primitives import serialization as crypto_serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.backends import default_backend as crypto_default_backend
 
 logger = logging.getLogger (__name__)
 
@@ -153,7 +158,8 @@ class Container:
 
 class System:
     """ Distributed system of interacting containerized software. """
-    def __init__(self, config, name, principal, service_account, conn_string, proxy_rewrite_rule, containers, identifier, services={}, security_context={}, init_security_context={}):
+    def __init__(self, config, name, principal, service_account, conn_string, proxy_rewrite_rule, containers, identifier,
+                 gitea_integration, services={}, security_context={}, init_security_context={}):
         """ Construct a new abstract model of a system given a name and set of containers.
         
             Serves as context for the generation of compute cluster specific artifacts.
@@ -197,6 +203,9 @@ class System:
         self.system_env = dict(principal)
         """ System tags """
         self.username = principal.get("username")
+        username_remove_us = self.username.replace("_", "-")
+        username_remove_dot = username_remove_us.replace(".", "-")
+        self.username_all_hyphens = username_remove_dot
         self.host = principal.get("host")
         self.annotations = {}
         self.namespace = "default"
@@ -232,6 +241,11 @@ class System:
             self.nfsrods_host = os.environ.get('NFSRODS_HOST', '')
         else:
             logger.info("Irods zone not enabled")
+        """gitea settings"""
+        self.gitea_integration = gitea_integration
+        self.gitea_host = os.environ.get("GITEA_HOST", " ")
+        self.gitea_user = os.environ.get("GITEA_USER", " ")
+        self.gitea_service_name = os.environ.get("GITEA_SERVICE_NAME", " ")
 
     @staticmethod
     def set_security_context(sc_from_registry):
@@ -431,6 +445,7 @@ class System:
             "proxy_rewrite_rule": spec.get("proxy_rewrite_rule", False),
             "containers": containers,
             "identifier": identifier,
+            "gitea_integration": spec.get("gitea_integration", False),
             "services": services,
             "security_context": security_context,
             "init_security_context": init_security_context

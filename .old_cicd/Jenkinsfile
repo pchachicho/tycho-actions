@@ -1,3 +1,7 @@
+// ########## THIS FILE HAS BEEN DEPRECATED ########
+// #           IN FAVOR OF GITHUB ACTIONS          #
+// #################################################
+
 library 'pipeline-utils@master'
 
 CCV = ""
