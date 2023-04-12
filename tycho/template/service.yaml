@@ -35,6 +35,9 @@ metadata:
       {% if system.proxy_rewrite_rule == True %}
       rewrite: /private/{{system.system_name}}/{{system.username}}/{{system.identifier}}/{{system.conn_string}}
       {% endif %}
+      retry_policy:
+        retry_on: gateway-error
+        num_retries: 10
       bypass_auth: true
       timeout_ms: 300000
       idle_timeout_ms: 500000
