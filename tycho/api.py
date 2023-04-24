@@ -139,7 +139,7 @@ class StartSystemResource(TychoResource):
         """
         response = {}
         try:
-            app.logger.info (f"start-system: {json.dumps(request.json, indent=2)}")
+            app.logger.info (f"api.StartSystemResource.post - start-system: start-system: {json.dumps(request.json, indent=2)}")
             self.validate (request, component="System")
             system = tycho().parse (request.json)
             response = self.create_response (
