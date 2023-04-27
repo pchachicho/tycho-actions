@@ -177,8 +177,7 @@ class TychoContext:
         logger.debug (f"-- product {self.product} resolution => apps: {apps.keys()}")
         apps = self.add_conf_impl(apps, context)
         for app, value in apps.items():
-            logger.debug("app:" + app)
-            logger.debug(value)
+            logger.debug(f"TychoContext._grok -\napp: {app}\nvalue: {value}")
         return apps
     
     def get_definition(self, app_id):
@@ -251,14 +250,6 @@ class TychoContext:
                 else:
                     logger.error (f"-- app {app_id}. failed to parse spec.")
                 raise e
-        else:
-             try:
-                 logger.debug(f"-- removing cached volumes")
-                 spec['services'][app_id].pop('volumes', None)
-             except Exception as e:
-                 traceback.print_exc ()
-                 logger.error (f"-- app {app_id}. failed to remove cached volumes in parse spec.")
-                 raise e
         return spec
 
     def get_env_registry(self, app_id, settings):
@@ -296,7 +287,10 @@ class TychoContext:
     
     def start (self, principal, app_id, resource_request, host):
         """ Get application metadata, docker-compose structure, settings, and compose API request. """
+        logger.info(f"context.start - \nprincipal: {principal}\napp_id: {app_id}\n"
+                     "resource_request: {resource_request}\nhost: {host}")
         spec = self.get_spec (app_id)
+        logger.debug(f"context.start - \nspec: {spec}")
         settings = self.client.parse_env (self.get_settings (app_id))
         settings_all = self.get_env_registry(app_id, settings)
         services = self.apps[app_id]['services']
@@ -305,7 +299,7 @@ class TychoContext:
             "clients" : []
           } for k, v in services.items ()
         }
-        logger.debug (f"parsed {app_id} settings: {settings}")
+        logger.debug (f"context.start - parsed {app_id}\nsettings: {settings}\nsettings_all: {settings_all}")
         """ Use a pre-existing k8s service account """
         service_account = self.apps[app_id]['serviceAccount'] if 'serviceAccount' in self.apps[app_id].keys() else None
         """ Add entity's auth information """

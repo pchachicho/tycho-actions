@@ -123,14 +123,14 @@ class TychoClient:
         if os.environ.get("REST_API", "false") == "true":
             response = requests.post (f"{self.url}/{service}", json=request)
             result_text = f"HTTP status {response.status_code} received from service: {service}"
-            logger.debug (result_text)
+            logger.debug (f"TychoClient.request - {result_text}")
             if not response.status_code == 200:
                 raise Exception (f"Error: {result_text}")
             result = response.json ()
-            logger.debug (json.dumps(result, indent=2))
+            logger.debug (f"TychoClient.request - {json.dumps(result, indent=2)}")
         else:
             result = self.actions.get(service).post(request)
-            logger.debug(f"{result} received from service: {service}")
+            logger.debug(f"TychoClient.request -  {result} received from service: {service}")
         return result
     
     def format_name (self, name):
@@ -251,9 +251,9 @@ class TychoClient:
             "system" : system,
             "services" : services
         }
-        logger.debug (f"request: {json.dumps(request, indent=2)}")
+        logger.debug (f"client.up - request: {json.dumps(request, indent=2)}")
         response = self.start (request)
-        logger.debug (response)
+        logger.debug (f"client.up - response: {response}")
         if response.status == 'error':
             print (response.message)
         else:
@@ -284,7 +284,7 @@ class TychoClient:
             request = { "name" : self.format_name (name) } if name else {}
             request['username'] = 'renci'
             response = self.status (request)
-            logger.debug (response)
+            logger.debug (f"client.list - response: {response}")
             if response.status  == 'success':
                 if terse:
                     for service in response.services:
@@ -319,7 +319,7 @@ class TychoClient:
         try:
             for name in names:
                 response = self.delete ({ "name" : self.format_name(name) })
-                logger.debug (json.dumps(response,indent=2))
+                logger.debug (f"TychoClient.down - {json.dumps(response,indent=2)}")
                 if response.get('status',None) == 'success':
                     print (f"{name}")
                 else:
@@ -349,7 +349,7 @@ class TychoClient:
         logger.info(f"System specifications and metadata to be modified: {mod_items}")
         try:
             response = self.modify(mod_items)
-            logger.debug(json.dumps(response, indent=2))
+            logger.debug(f"TychoClient.patch - {json.dumps(response, indent=2)}")
             return response
         except (AttributeError, Exception) as e:
             logger.exception(f"Error in modifying system. {e}")

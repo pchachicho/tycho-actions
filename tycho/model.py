@@ -359,7 +359,7 @@ class System:
             else: env['system_port'] = 8000
             logger.debug ("applying environment settings.")
             system_template = yaml.dump (system)
-            logger.debug (json.dumps(env,indent=2))
+            logger.debug (f"System.parse - {json.dumps(env,indent=2)}")
             system_rendered = TemplateUtils.render_text(template_text=system_template,context=env)
             logger.debug (f"applied settings:\n {system_rendered}")
             for system_render in system_rendered:
