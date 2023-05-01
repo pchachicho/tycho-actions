@@ -1,5 +1,8 @@
 # Tycho
-[![Build Status](https://api.travis-ci.org/helxplatform/tycho.svg?branch=master)](https://travis-ci.org/heliumplusdatastage/tycho)
+
+[![PyPI](https://img.shields.io/pypi/v/tycho-api?label=tycho)](https://pypi.org/project/tycho-api/)
+[![Build-Project](https://github.com/helxplatform/tycho/actions/workflows/build-project.yml/badge.svg)](https://github.com/helxplatform/tycho/actions/workflows/build-project.yml)
+[![flake8](https://github.com/helxplatform/tycho/actions/workflows/flake8.yml/badge.svg)](https://github.com/helxplatform/tycho/actions/workflows/flake8.yml)
 
 Tycho is an API, compiler, and executor for cloud native distributed systems.
 
@@ -24,20 +27,12 @@ This work relies on these foundations:
 * **[Docker-compose](https://docs.docker.com/compose/)**: Syntax and tool chain for executing distributed systems of containers.
 * **Docker Swarm**: Docker only container orchestration platform with minimal adoption.
 
-## Source Code and Tags
+## CI/CD
+Github Actions are employed to test and publish development and main releases of tycho to [pypi](https://pypi.org/project/tycho-api/). These releases follow SemVer ('Major', 'Minor', 'Patch') versioning.
 
-This software is supported and released along SemVer semantics where new features are
-tagged vX.Y.Z (major, minor, patch) and the corresponding package is pushed to PYPI
+To create a main/master pypi package for tycho, the `VERSION` in `tycho/__init__.py` will need to be updated by the developer to the desired stable release version number. 
 
-### Version starting with 1.7.0 origin
-
-SemVer releases start with 1.7.0
-
-## Continuos Integration (CI) with Github Actions
-
-Tycho is packaged and published to pypi automatically by the github workflows on this project. To create a main/master pypi package for tycho, the `VERSION` in `tycho/__init__.py` will need to be updated by the developer to the desired stable release version number. 
-
-If testing in the develop branch only, editing the `tycho/__init__.py` file will NOT be necessary to generate a pypi package build, as the pypi-dev-upload.yml workflow will create a new tag based on day and time for your testing purposes which is uploaded upon each push to the develop branch. This ".dev" tag does not affect the develop branch code at all. 
+If testing in the develop branch, editing the `tycho/__init__.py` file will NOT be necessary to generate a pypi package build, as the pypi-dev-upload.yml workflow will create a new tag based on day and time for your testing purposes which is uploaded upon each push to the develop branch. This ".dev" tag does not affect the develop branch code at all. 
 
 This means that a pr from feature branch to develop branch results in an automatic pypi build. If on the same day, a change to the develop branch occurs, then a new build is also generated with a differing ".dev" tag similar to `tycho-api:1.12.0.dev20230221030806`. 
 

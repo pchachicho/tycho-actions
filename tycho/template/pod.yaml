@@ -33,9 +33,17 @@ spec:
     effect: "NoSchedule"
   {% endif %}
   {% endif %}
-  {% if system.security_context.fs_group %}
+  {% if system.security_context["run_as_user"] or system.security_context.run_as_group or system.security_context.fs_group %}
   securityContext:
+    {% if system.security_context["run_as_user"] %}
+    runAsUser: {{ system.security_context["run_as_user"] }}
+    {% endif %}
+    {% if system.security_context.run_as_group %}
+    runAsGroup: {{ system.security_context.run_as_group }}
+    {% endif %}
+    {% if system.security_context.fs_group %}
     fsGroup: {{ system.security_context.fs_group }}
+    {% endif %}
   {% endif %}
 {% if (system.enable_init_container == "true") and (system.create_home_dirs == "true") and (system.dev_phase != "test") %}
   initContainers:
@@ -62,25 +70,15 @@ spec:
     args:
       - mkdir -p {{ system.parent_dir }}/{{ system.subpath_dir }} &&
         mkdir -p {{ system.parent_dir }}/{{ system.shared_dir }} &&
+        {% if system.gitea_integration == True %}
+        mkdir -p {{ system.parent_dir }}/{{ system.subpath_dir }}/.ssh &&
+        echo -e "Host {{ system.gitea_host }}\n     Hostname {{ system.gitea_service_name }}\n     User {{ system.gitea_user }}\n     IdentityFile ~/.ssh/id_gitea" > {{ system.parent_dir }}/{{ system.subpath_dir }}/.ssh/config &&
+        {% endif %}
         ls -aln {{ system.parent_dir }} &&
         echo OK
     volumeMounts:
     - name: {{ system.stdnfs_pvc }}
       mountPath: {{ system.parent_dir }}
-  {% if system.irods_enabled == True %}
-  - name: nfsrods-prep
-    image: busybox:1.28
-    # Fixed resources
-    command: ['sh', '-c'] 
-    args:
-    - echo {{system.nfsrods_uid}} > /permissions/irodsvalidusers
-    securityContext:
-      runAsUser: 0
-    volumeMounts:
-    - name: irods-permissions
-      mountPath: /permissions
-      subPath: permissions
-  {% endif %}
 {% endif %}
 {% endfor %}
   containers:
@@ -182,9 +180,14 @@ spec:
 {% endif %}
     volumeMounts:
     {% if system.irods_enabled == True %}
-    - name: irods-permissions
-      mountPath: /permissions
-      readOnly: false
+    - name: nfs
+      mountPath: "/home/nfs"
+    {% endif %}
+    {% if system.gitea_integration == True %}
+    - name: {{ system.username_all_hyphens }}-id-gitea
+      mountPath: {{ system.parent_dir }}/{{ system.subpath_dir }}/.ssh/id_gitea
+      subPath: id_gitea
+      readOnly: true
     {% endif %}
 {% if container.volumes %}
 {% for volume in system.volumes %}
@@ -263,19 +266,18 @@ spec:
     {% endif %}
 {% endif %}
 {% endfor %}
-
   volumes:
   {% if system.irods_enabled == True %}
-  - name: irods-permissions
-    ephemeral:
-      volumeClaimTemplate:
-        spec:
-          accessModes: [ "ReadWriteMany" ]
-          # This storage class is how Kubernetes knows to give you an NVMe volume instead of a normal NFS volume
-          storageClassName: nvme-ephemeral
-          resources:
-            requests:
-              storage: 1Gi
+  - name: nfs
+    nfs:
+      server: {{ system.nfsrods_host }}
+      path: /
+  {% endif %}
+  {% if system.gitea_integration == True %}
+  - name: {{ system.username_all_hyphens }}-id-gitea
+    secret:
+      secretName: {{ system.username_all_hyphens }}-id-gitea
+      defaultMode: 0600
   {% endif %}
 # Changes
 {% for container in system.containers %}
