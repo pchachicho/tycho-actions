@@ -66,7 +66,7 @@ def __test_context ():
                 successful_count = successful_count + 1
             except Exception as e:
                 logger.debug (f"App {app_id} failed. {e}")
-                traceback.print_exc ()
+                traceback.print_exc()
                 failed.append (app_id)
                 failed_count = failed_count + 1
         logger.info (f"{product.upper()} had {successful_count} successful apps and {failed_count} failed apps.")
