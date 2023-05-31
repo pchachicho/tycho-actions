@@ -18,7 +18,6 @@ containers running on abstracted compute fabrics.
  
 """
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 """ Load the schema. """
 schema_file_path = os.path.join (
