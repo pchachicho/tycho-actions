@@ -166,6 +166,9 @@ spec:
       {% if container.limits.gpus != None %}
         {{ system.gpu_resource_name }}: {{ container.limits.gpus }}
       {% endif %}
+      {% if container.limits.ephemeralStorage != None and container.limits.ephemeralStorage != "0" and container.limits.ephemeralStorage != "" %}
+        ephemeral-storage: {{ container.limits.ephemeralStorage }}
+      {% endif %}
       {% endif %}
       requests:
       {% if container.requests  %}
@@ -175,6 +178,9 @@ spec:
       {% endif %}
       {% if container.requests.gpus != None %}
         {{ system.gpu_resource_name }}: {{ container.requests.gpus }}
+      {% endif %}
+      {% if container.requests.ephemeralStorage != None and container.requests.ephemeralStorage != "0" and container.requests.ephemeralStorage != "" %}
+        ephemeral-storage: {{ container.requests.ephemeralStorage }}
       {% endif %}
       {% endif %}
 {% endif %}

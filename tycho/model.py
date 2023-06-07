@@ -22,22 +22,26 @@ class Limits:
     def __init__(self,
                  cpus=None,
                  gpus=None,
-                 memory=None):
+                 memory=None,
+                 ephemeralStorage=None):
         """ Create limits.
             
             :param cpus: Number of CPUs. May be a fraction.
             :type cpus: str
-            :param gpus: Number of GPUs. May be a fraction.
+            :param gpus: Number of GPUs.
             :type gpus: str
             :param memory: Amount of memory 
             :type memory: str
+            :param ephemeralStorage: Amount of ephemeral storage 
+            :type ephemeralStorage: str
         """
         self.cpus = cpus
         self.gpus = gpus
-        #assert (self.gpus).is_integer, "Fractional GPUs not supported"
+        # assert (self.gpus).is_integer, "Fractional GPUs not supported"
         self.memory = memory
+        self.ephemeralStorage = ephemeralStorage
     def __repr__(self):
-        return f"cpus:{self.cpus} gpus:{self.gpus} mem:{self.memory}"
+        return f"cpus:{self.cpus} gpus:{self.gpus} mem:{self.memory} ephemeralStorage:{self.ephemeralStorage}"
 
 
 class Volumes:

@@ -48,7 +48,8 @@ class TychoService:
         total = {
             "gpu": 0,
             "cpu" : 0,
-            "memory" : 0
+            "memory" : 0,
+            "ephemeralStorage" : 0
         }
         for key, val in utilization.items ():
             if 'cpu' in val.keys():
