@@ -328,7 +328,7 @@ class TychoClient:
                 else:
                     print (json.dumps (response, indent=2))
         except Exception as e:
-            traceback.print_exc (e)
+            traceback.print_exc()
 
     def patch(self, mod_items):
         """
@@ -427,7 +427,7 @@ class TychoClientFactory:
                         url = f"http://{ip}:{port}"
                     except ValueError as e:
                         logger.error ("unable to get minikube ip address")
-                        traceback.print_exc (e)
+                        traceback.print_exc()
             print(f"URL: {url}")
         except Exception as e:
             url = default_url

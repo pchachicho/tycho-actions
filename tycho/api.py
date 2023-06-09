@@ -81,13 +81,13 @@ class TychoResource(Resource):
             jsonschema.validate(request.json, to_validate)
         except jsonschema.exceptions.ValidationError as error:
             app.logger.error (f"ERROR: {str(error)}")
-            traceback.print_exc (error)
+            traceback.print_exc()
             abort(Response(str(error), 400))
 
     def create_response (self, result=None, status='success', message='', exception=None):
         """ Create a response. Handle formatting and modifiation of status for exceptions. """
         if exception:
-            traceback.print_exc ()
+            traceback.print_exc()
             status='error'
             exc_type, exc_value, exc_traceback = sys.exc_info()
             message = f"{exception.args[0]} {''.join (exception.args[1])}" \

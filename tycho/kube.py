@@ -158,7 +158,7 @@ class KubernetesCompute(Compute):
                             break
                     break
             except Exception as e:
-                traceback.print_exc (e)
+                traceback.print_exc()
                 exc_type, exc_value, exc_traceback = sys.exc_info()
                 text = traceback.format_exception(
                     exc_type, exc_value, exc_traceback)
@@ -367,7 +367,7 @@ class KubernetesCompute(Compute):
                     namespace=namespace)
             
         except ApiException as e:
-            traceback.print_exc (e)
+            traceback.print_exc()
             exc_type, exc_value, exc_traceback = sys.exc_info()
             text = traceback.format_exception(
                 exc_type, exc_value, exc_traceback)
