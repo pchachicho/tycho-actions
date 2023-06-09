@@ -37,7 +37,8 @@ class Limits:
         """
         self.cpus = cpus
         self.gpus = gpus
-        # assert (self.gpus).is_integer, "Fractional GPUs not supported"
+        # Check if the gpus is a digit.
+        assert isinstance(self.gpus, int), "Fractional GPUs not supported"
         self.memory = memory
         self.ephemeralStorage = ephemeralStorage
     def __repr__(self):
