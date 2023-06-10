@@ -35,7 +35,7 @@ class Config(dict):
                     self.conf['tycho']['compute']['platform']['kube']['ip'] = ip
                 except ValueError as e:
                     logger.error ("unable to get minikube ip address")
-                    traceback.print_exc (e)
+                    traceback.print_exc()
 
     def __setitem__(self, key, val):
         self.conf.__setitem__(key, val)

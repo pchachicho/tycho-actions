@@ -22,22 +22,27 @@ class Limits:
     def __init__(self,
                  cpus=None,
                  gpus=None,
-                 memory=None):
+                 memory=None,
+                 ephemeralStorage=None):
         """ Create limits.
             
             :param cpus: Number of CPUs. May be a fraction.
             :type cpus: str
-            :param gpus: Number of GPUs. May be a fraction.
+            :param gpus: Number of GPUs.
             :type gpus: str
             :param memory: Amount of memory 
             :type memory: str
+            :param ephemeralStorage: Amount of ephemeral storage 
+            :type ephemeralStorage: str
         """
         self.cpus = cpus
         self.gpus = gpus
-        #assert (self.gpus).is_integer, "Fractional GPUs not supported"
+        # Check if the gpus is a digit.
+        assert isinstance(self.gpus, int), "Fractional GPUs not supported"
         self.memory = memory
+        self.ephemeralStorage = ephemeralStorage
     def __repr__(self):
-        return f"cpus:{self.cpus} gpus:{self.gpus} mem:{self.memory}"
+        return f"cpus:{self.cpus} gpus:{self.gpus} mem:{self.memory} ephemeralStorage:{self.ephemeralStorage}"
 
 
 class Volumes:
@@ -128,6 +133,7 @@ class Container:
         self.identity = identity
         self.limits = Limits(**limits) if isinstance(limits, dict) else limits
         self.requests = Limits(**requests) if isinstance(requests, dict) else requests
+        logger.debug(f"requests: ${self.requests}\nlimits: ${self.limits}")
         if isinstance(self.limits, list):
             self.limits = self.limits[0] # TODO - not sure why this is a list.
         self.ports = ports
@@ -232,6 +238,7 @@ class System:
         """Resources and limits for the init container"""
         self.init_cpus = os.environ.get("TYCHO_APP_INIT_CPUS", "250m")
         self.init_memory = os.environ.get("TYCHO_APP_INIT_MEMORY", "250Mi")
+        self.gpu_resource_name = os.environ.get("TYCHO_APP_GPU_RESOURCE_NAME", "nvidia.com/gpu")
         """Proxy rewrite rule for ambassador service annotations"""
         self.proxy_rewrite_rule = proxy_rewrite_rule
         # """Flag for checking if an IRODS connection is enabled"""
@@ -359,9 +366,10 @@ class System:
             else: env['system_port'] = 8000
             logger.debug ("applying environment settings.")
             system_template = yaml.dump (system)
-            logger.debug (f"System.parse - {json.dumps(env,indent=2)}")
+            logger.debug (f"System.parse - system_template:\n{json.dumps(system_template,indent=2)}")
+            logger.debug (f"System.parse - env:\n{json.dumps(env,indent=2)}")
             system_rendered = TemplateUtils.render_text(template_text=system_template,context=env)
-            logger.debug (f"applied settings:\n {system_rendered}")
+            logger.debug (f"System.parse - system_rendered:\n {system_rendered}")
             for system_render in system_rendered:
                 system = system_render
 

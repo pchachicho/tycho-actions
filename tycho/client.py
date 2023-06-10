@@ -48,7 +48,8 @@ class TychoService:
         total = {
             "gpu": 0,
             "cpu" : 0,
-            "memory" : 0
+            "memory" : 0,
+            "ephemeralStorage" : 0
         }
         for key, val in utilization.items ():
             if 'cpu' in val.keys():
@@ -56,8 +57,10 @@ class TychoService:
                     total['cpu'] = total['cpu'] + int(val['cpu'].replace ('m', ''))
                 else:
                     total['cpu'] = total['cpu'] + int(val['cpu']) * 1000
-            if 'nvidia.com/gpu' in val.keys():
-                total['gpu'] = total['gpu'] + int(val['nvidia.com/gpu'])
+            # Will have to adjust this if we want to check for non-nvidia GPUs.
+            for key in val.keys():
+                if 'nvidia' in key:
+                    total['gpu'] = total['gpu'] + int(val[key]) * 1000
             mem = val['memory'].replace ("i", "")
             """ Run the conversion function designated by the last character of the value on the integer value """
             mem_val = mem_converter[mem[-1]] (int(mem[:-1]))
@@ -325,7 +328,7 @@ class TychoClient:
                 else:
                     print (json.dumps (response, indent=2))
         except Exception as e:
-            traceback.print_exc (e)
+            traceback.print_exc()
 
     def patch(self, mod_items):
         """
@@ -424,7 +427,7 @@ class TychoClientFactory:
                         url = f"http://{ip}:{port}"
                     except ValueError as e:
                         logger.error ("unable to get minikube ip address")
-                        traceback.print_exc (e)
+                        traceback.print_exc()
             print(f"URL: {url}")
         except Exception as e:
             url = default_url

@@ -18,7 +18,6 @@ containers running on abstracted compute fabrics.
  
 """
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 """ Load the schema. """
 schema_file_path = os.path.join (
@@ -54,7 +53,7 @@ class TychoResource:
             jsonschema.validate(request, to_validate)
         except jsonschema.exceptions.ValidationError as error:
             logger.error(f"ERROR: {str(error)}")
-            traceback.print_exc (error)
+            traceback.print_exc()
 
     def create_response(self, result=None, status='success', message='', exception=None):
         """ Create a response. Handle formatting and modifiation of status for exceptions. """
