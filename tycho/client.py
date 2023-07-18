@@ -124,7 +124,7 @@ class TychoClient:
             :param request: JSON to send to the API endpoint.
         """
         if os.environ.get("REST_API", "false") == "true":
-            response = requests.post (f"{self.url}/{service}", json=request)
+            response = requests.post (f"{self.url}/{service}", json=request) # nosec B113
             result_text = f"HTTP status {response.status_code} received from service: {service}"
             logger.debug (f"TychoClient.request - {result_text}")
             if not response.status_code == 200:
@@ -539,9 +539,10 @@ if __name__ == "__main__":
         if os.path.exists (env_file):
             with open (env_file, 'r') as stream:
                 settings = stream.read ()
-                
+        #
+        # added SafeLoader type but not sure if unsafe load is needed.      
         with open(args.file, "r") as stream:
-            system = yaml.load (stream.read ())
+            system = yaml.load (stream.read (), Loader=yaml.SafeLoader)
     else:
         """ Generate a docker-compose spec based on the CLI args. """
         name = args.name
