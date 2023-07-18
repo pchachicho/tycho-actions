@@ -35,3 +35,24 @@ jobs:
         flake8 --ignore=E,W --exit-zero . 
       # We continue on error here until the code is clean
       continue-on-error: true
+
+############################ Bandit ################################
+  bandit:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install Requirements
+      run: |
+        pip install -r requirements.txt
+        pip install bandit
+        pip install .
+
+    # Only report high security issues
+    - name: Test with Bandit
+      run: |
+        bandit -r src -n3 -lll
