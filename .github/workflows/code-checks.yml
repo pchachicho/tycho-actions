@@ -55,4 +55,4 @@ jobs:
     # Only report high security issues
     - name: Test with Bandit
       run: |
-        bandit -r src -n3 -lll
+        bandit -r tycho/*.py -n 3 -lll
