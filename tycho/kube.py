@@ -277,11 +277,9 @@ class KubernetesCompute(Compute):
                 exe = shutil.which ('kubectl')
                 command = f"{exe} port-forward --pod-running-timeout=3m0s deployment/{app_id} {node_port}:{port}"
                 logger.debug (f"-- port-forward: {command}")
-                # commented out July 18 2023 by Joshua Seals. Want to make sure this is not needed.
-                # shell=true was flagged as vulnerability by bandit. https://cwe.mitre.org/data/definitions/78.html
-                # process = subprocess.Popen (command,
-                #                             shell=True,
-                #                             stderr=subprocess.STDOUT)
+                process = subprocess.Popen (command,
+                                            shell=True,
+                                            stderr=subprocess.STDOUT)
                 """ process dies when the other end disconnects so no need to clean up in delete. """
             #ip_address = "127.0.0.1"
         except Exception as e:
