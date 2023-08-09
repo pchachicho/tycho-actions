@@ -1,8 +1,5 @@
-
-version: 2
-updates:
 # Note directory is relative to the root of the repo, with exception to github-actions ecosystem. 
-# 
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#directory
 version: 2
 updates:
 
