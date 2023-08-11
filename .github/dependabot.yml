@@ -1,0 +1,25 @@
+# Note directory is relative to the root of the repo, with exception to github-actions ecosystem. 
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#directory
+version: 2
+updates:
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    reviewers:
+      - "joshua-seals"
+
+  - package-ecosystem: "pip"
+    directory: "/tycho"
+    schedule:
+      interval: "weekly"
+    reviewers:
+      - "joshua-seals"
+      - "Hoid"
+      - "waTeim"
+      - "pj-linebaugh"
+      - "ptlharit2"
+      - "frostyfan109"
+      - "cnbennett3"
+
