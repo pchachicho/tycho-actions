@@ -236,6 +236,8 @@ class System:
         """init security context"""
         self.init_security_context = init_security_context
         """Resources and limits for the init container"""
+        self.init_image_repository = os.environ.get("TYCHO_APP_INIT_IMAGE_REPOSITORY", "busybox")
+        self.init_image_tag = os.environ.get("TYCHO_APP_INIT_IMAGE_TAG", "latest")
         self.init_cpus = os.environ.get("TYCHO_APP_INIT_CPUS", "250m")
         self.init_memory = os.environ.get("TYCHO_APP_INIT_MEMORY", "250Mi")
         self.gpu_resource_name = os.environ.get("TYCHO_APP_GPU_RESOURCE_NAME", "nvidia.com/gpu")
