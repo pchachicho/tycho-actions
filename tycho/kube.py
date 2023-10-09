@@ -426,6 +426,10 @@ class KubernetesCompute(Compute):
                 ip_address = "127.0.0.1"
                 port = 80
 
+                desired_replicas = item.status.replicas
+                ready_replicas = item.status.ready_replicas
+                is_ready = ready_replicas == desired_replicas
+
                 result.append(
                     {
                         "name": item.metadata.name,
@@ -436,7 +440,8 @@ class KubernetesCompute(Compute):
                         "creation_time": time,
                         "username": item_username,
                         "utilization": pod_resources,
-                        "workspace_name": workspace_name
+                        "workspace_name": workspace_name,
+                        "is_ready": is_ready
                     }
                 )
 
