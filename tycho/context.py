@@ -328,7 +328,9 @@ class TychoContext:
         spec["services"][app_id]["conn_string"] = conn_string
         """ Add a proxy rewrite rule """
         proxy_rewrite_rule = self.apps.get(app_id).get("proxy-rewrite-rule", False)
-        spec["services"][app_id]["proxy_rewrite_rule"] = proxy_rewrite_rule
+        proxy_rewrite = self.apps.get(app_id).get("proxy-rewrite", { "enabled":False, "target":None })
+        spec["services"][app_id]["proxy_rewrite"] = proxy_rewrite
+        if proxy_rewrite_rule: spec["services"][app_id]["proxy_rewrite"]["enabled"] = True
         """ Add gitea integration rule """
         gitea_integration = self.apps.get(app_id).get("gitea-integration", False)
         spec["services"][app_id]["gitea_integration"] = gitea_integration
