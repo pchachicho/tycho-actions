@@ -242,13 +242,13 @@ client = client_factory.get_client ()
 The "proxy_rewrite" feature ensures system-wide consistency in handling service 
 locations, especially when interacting with higher-level reverse proxies. By def
 ining annotations in `service.yaml`, Ambassador's behavior is tailored, allowing
-the underlying service to perceive an altered path while maintaining a consiste
-nt location view at the system level.
+the underlying service to perceive an altered path while maintaining a consistent
+location view at the system level.
 
-- **context.py**: Processes external specifications, capturing "proxy_rewrite" d
-irectives, and transforms them into an internal representation.
-- **model.py**: Forms the structural foundation of the system, accurately reflec
-ting the "proxy_rewrite" configurations and their implications.
-- **service.yaml**: Serves as a template for Kubernetes service definitions. Whe
-n interpreted, it influences Ambassador's behavior using "proxy_rewrite" annotat
-ions, ensuring path and location consistency across the system.
+- **context.py**: Processes external specifications, capturing "proxy_rewrite" 
+directives, and transforms them into an internal representation.
+- **model.py**: Forms the structural foundation of the system, accurately reflecting
+the "proxy_rewrite" configurations and their implications.
+- **service.yaml**: Serves as a template for Kubernetes service definitions. When
+interpreted, it influences Ambassador's behavior using "proxy_rewrite" annotations,
+ensuring path and location consistency across the system.
