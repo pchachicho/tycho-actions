@@ -164,7 +164,7 @@ class Container:
 
 class System:
     """ Distributed system of interacting containerized software. """
-    def __init__(self, config, name, principal, service_account, conn_string, proxy_rewrite_rule, containers, identifier,
+    def __init__(self, config, name, principal, service_account, conn_string, proxy_rewrite, containers, identifier,
                  gitea_integration, services={}, security_context={}, init_security_context={}):
         """ Construct a new abstract model of a system given a name and set of containers.
         
@@ -242,7 +242,7 @@ class System:
         self.init_memory = os.environ.get("TYCHO_APP_INIT_MEMORY", "250Mi")
         self.gpu_resource_name = os.environ.get("TYCHO_APP_GPU_RESOURCE_NAME", "nvidia.com/gpu")
         """Proxy rewrite rule for ambassador service annotations"""
-        self.proxy_rewrite_rule = proxy_rewrite_rule
+        self.proxy_rewrite = proxy_rewrite
         # """Flag for checking if an IRODS connection is enabled"""
         if os.environ.get("IROD_HOST") != None:
             logger.info("Irods host enabled")
@@ -452,7 +452,7 @@ class System:
             "principal": principal,
             "service_account": service_account,
             "conn_string": spec.get("conn_string", ""),
-            "proxy_rewrite_rule": spec.get("proxy_rewrite_rule", False),
+            "proxy_rewrite": spec.get("proxy_rewrite", { 'target':None, 'enabled':False }),
             "containers": containers,
             "identifier": identifier,
             "gitea_integration": spec.get("gitea_integration", False),
