@@ -458,6 +458,8 @@ class System:
             "security_context": security_context,
             "init_security_context": init_security_context
         }
+        if spec.get('proxy_rewrite_rule',None) != None:
+           system_specification["proxy_rewrite"]["enabled"] = spec.get('proxy_rewrite_rule')
         logger.debug (f"parsed-system: {json.dumps(system_specification, indent=2)}")
         system = System(**system_specification)
         system.source_text = yaml.dump (system)
