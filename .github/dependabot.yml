@@ -6,7 +6,8 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
+    target-branch: "develop"
     reviewers:
       - "joshua-seals"
 
@@ -14,6 +15,7 @@ updates:
     directory: "/tycho"
     schedule:
       interval: "monthly"
+    target-branch: "develop"
     reviewers:
       - "joshua-seals"
       - "Hoid"
