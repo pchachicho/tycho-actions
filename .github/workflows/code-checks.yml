@@ -16,6 +16,7 @@ on:
     branches: [ master, develop, main ]
     types: [ opened ]
 
+    
 jobs:
   Code-Checks:
     uses: pchachicho/renci-github-actions/.github/workflows/code-checks-tycho.yml@main
